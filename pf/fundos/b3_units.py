@@ -34,6 +34,7 @@ TESE = ("Compro o lado barato (unit ou cesta ON+PN) e converto no escriturador e
 BENCHMARK = "CDI"
 INICIO, CORTE = "2014-06-01", "2021-01-01"
 REGIME = "nenhum"
+CLASSE_IR = "acoes"                                   # swing trade 15% (operações de até R$ 10-25 mil: vendas do mês passam de R$ 20 mil)
 CUSTO_TROCA = .001
 PARAMS = {"limiar": .02, "prazo": 5, "lado": "ambos", "max_part": .10}
 GRADE = {"limiar": [.01, .02, .04], "lado": ["ambos", "unit_barata"], "prazo": [3, 10]}
@@ -58,8 +59,10 @@ def roda(d, capital=20000, custo_mult=1, lag=0, limiar=.02, prazo=5, lado="ambos
     key = (id(d), capital, custo_mult, lag, limiar, prazo, lado, max_part)
     if key in _RES:
         return _RES[key]
-    P, R, V, BI, AS = d["P"], d["R"].fillna(0), d["V"].fillna(0), d["BID"], d["ASK"]
     idx = B.DIAS
+    # painéis no calendário completo (com dados truncados as séries ficavam mais curtas que B.DIAS -> iloc fora do intervalo)
+    P, R, V, BI, AS = (d[k].reindex(idx) for k in ("P", "R", "V", "BID", "ASK"))
+    R, V = R.fillna(0), V.fillna(0)
     prazo = max(int(round(prazo)), 1)
     T = len(idx)
     pnl = np.zeros(T)

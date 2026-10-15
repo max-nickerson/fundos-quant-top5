@@ -48,7 +48,7 @@ def lista():
         if p.stem.startswith("_") or any(x in p.stem for x in ("rodar", "_base", "_comum", "_util")):
             continue
         txt = p.read_text(encoding="utf-8", errors="ignore")
-        if "excesso" in txt and "\nNOME" in txt and "\nPARAMS" in txt:
+        if ("excesso" in txt or "montar(" in txt) and "\nNOME" in txt and "\nPARAMS" in txt:
             out.append(p.stem)
     return out
 
@@ -68,8 +68,68 @@ def aliquota(m):
     return {"isento": 0.0, "acoes_isentas": 0.0, "day_trade": .20}.get(getattr(m, "CLASSE_IR", "exterior"), .15)
 
 
-def apos_ir(m, d, capital, r):
-    """Regra única e conservadora (as funções classes_ir das frentes usam unidades diferentes):
+import ir as IRPF  # noqa: E402
+
+CLASSE_POR_FUNDO = {   # quando o módulo não declara CLASSE_IR
+    "b3_": "acoes", "mh_": "acoes", "db3_cc_isenta": "acoes", "rev_opa": "acoes", "rev_rebal_ibovespa": "acoes", "rev_pead": "acoes",
+    "rev_followon": "acoes", "rev_crise": "acoes", "rev_petroleo": "acoes", "rev_debentures": "renda_fixa", "rev_tesouro": "renda_fixa",
+    "rev_opcoes_b3": "opcoes_b3", "rev_base_ind": "futuros_b3", "rev_carry_moedas": "futuros_b3", "rev_variancia": "exterior",
+    "rev_mineradoras": "exterior", "rev_spinoffs": "exterior", "rev_base_cripto": "exterior", "gl_bdr": "etf_b3", "gl_rotacao": "etf_b3",
+    "gl_hedge_cdi": "etf_b3", "gl_wsp": "futuros_b3", "gl_spinoff": "exterior", "gl_cripto": "cripto", "cme_": "exterior"}
+
+
+# vereditos da auditoria (pf/pesquisa/auditoria_pf.md e correcoes_finais.md): REPROVADO/BETA não entram no top 5 de alfa
+AUDITORIA = {
+    "db3_cc_isenta": ("BETA", "é carteira de 3 ações (beta); as calls sozinhas perdem 1,8 pp a.a."),
+    "gl_bdr_limite": ("REPROVADO", "fills de ordem limitada com dado diário (seleção adversa); conservador: −12,6 pp"),
+    "gl_bdr_limite_aud": ("REPROVADO", "versão conservadora: −12,6 pp"),
+    "b3_leilao_noite": ("SUBSTITUÍDO", "custo subestimado; ver b3_leilao_noite_aud (8 bps ida e volta)"),
+    "b3_ofertas_varejo": ("SUBSTITUÍDO", "sem rateio; ver b3_ofertas_varejo_aud (rateio 15% e pedido bloqueado)"),
+    "cme_vxm": ("REPROVADO", "1 VXM perdeu ~R$ 31 mil em mar/2020 (> capital): liquidado no pico; quedas de −87%/−97%"),
+    "rev_carry_moedas": ("REPROVADO", "o grosso é a perna WDO (carry do real) sintética; só G10: +1,2 pp depois do IR"),
+    "db3_wdo_carry": ("BETA", "carry do real: com R$ 20 mil 2,6x alavancado (−57 pp em 2024); com R$ 50 mil é beta de 'comprado em real'"),
+    "rev_pead": ("REPROVADO", "limiar realista: −0,2 pp; sem os 10 melhores: −3,8 pp"),
+    "db3_trava_bova": ("APROVADO COM CORREÇÃO", "com uma perda máxima no período o ganho vai a ≈ 0 (0,1/0,2 pp)"),
+    "rev_opa": ("APROVADO COM CORREÇÃO", "HBOR3 com spread de 44% dominava; corrigido ≈ +0,5 pp — mesma tese de b3_opa_leilao"),
+    "rev_debentures": ("APROVADO COM CORREÇÃO", "carry de crédito em 5 nomes, corrigido +0,3/+0,6 pp"),
+    "b3_fracionario": ("REPROVADO", "lucro original era movimento intradiário (pernas não simultâneas); APLICAVEL=False"),
+    "gl_cripto_premio": ("BETA", "o ganho é a alta do cripto em 2023–24 (negativo sem os 10 melhores)"),
+    "gl_cripto_tendencia": ("BETA", "exposição a cripto; PBO 76%, sem os 10 melhores −17 pp"),
+    "gl_wsp": ("BETA", "exposição a S&P em R$ com tendência — beta de ações, não alfa"),
+    "cme_metais": ("BETA", "ouro comprado em 2024–26 (10 negócios); IS ≈ 0"),
+    "cme_tendencia": ("BETA", "tendência com 2–6 posições; PBO 85% com R$ 20 mil"),
+}
+
+
+def classe_ir(nome, m=None):
+    c = getattr(m, "CLASSE_IR", None) if m is not None else None
+    if c:
+        return c
+    txt = (FUNDOS_DIR / f"{nome}.py").read_text(encoding="utf-8", errors="ignore") if (FUNDOS_DIR / f"{nome}.py").exists() else ""
+    c = next((l.split("=")[1].split("#")[0].strip().strip("\"'") for l in txt.splitlines() if l.startswith("CLASSE_IR")), None)
+    if c:
+        return c
+    base = nome.replace("_aud", "")
+    return next((v for k, v in sorted(CLASSE_POR_FUNDO.items(), key=lambda kv: -len(kv[0])) if base.startswith(k)), "exterior")
+
+
+def vendas(m, d, capital):
+    try:
+        W, _ = m.posicoes(d, capital=capital) if "capital" in m.posicoes.__code__.co_varnames else m.posicoes(d)
+        return IRPF.vendas_mensais_de_pesos(W, capital)
+    except Exception:
+        return None
+
+
+def apos_ir(m, d, capital, r, nome=None):
+    """IR de pessoa física do jeito certo (pf/ir.py): mensal na B3 com isenção de ações ≤ R$ 20 mil/mês, anual no exterior, etc."""
+    cls = classe_ir(nome or getattr(m, "__name__", ""), m)
+    vm = vendas(m, d, capital) if (cls in IRPF.ISENCAO and d is not None and hasattr(m, "posicoes")) else None
+    return IRPF.cota_apos_ir(r, C.CDI, capital, cls, vm)
+
+
+def _apos_ir_uniforme(m, d, capital, r):
+    """(versão anterior) Regra única e conservadora (as funções classes_ir das frentes usam unidades diferentes):
     cota depois do IR = CDI depois de 15% + excesso sobre o CDI depois da alíquota da classe (anual, com compensação de prejuízo)."""
     cdi_l = pf.cdi_liquido().reindex(r.index).fillna(0)
     ex = (r - C.CDI.reindex(r.index).fillna(0))
@@ -111,7 +171,7 @@ def bateria_um(nome, n_leque=30):
             r = R["r"]
         else:
             r = RB.cota(m, m.excesso(d))
-        ri = apos_ir(m0, d, cap, r)
+        ri = apos_ir(m0, d, cap, r, nome)
         o = RB.oos(m, r)
         out[f"r{cap // 1000}"] = r
         out[f"ri{cap // 1000}"] = ri
@@ -143,25 +203,34 @@ def ranking():
     L = []
     for p in sorted(BAT.glob("*.pkl")):
         o = pickle.load(open(p, "rb"))
-        txt = (FUNDOS_DIR / f"{o['nome']}.py").read_text(encoding="utf-8", errors="ignore")
-        cls = next((l.split("=")[1].strip().strip("\"'") for l in txt.splitlines() if l.startswith("CLASSE_IR")), "exterior")
+        cls = classe_ir(o["nome"])
         mm = types.SimpleNamespace(CLASSE_IR=cls, CORTE=o["CORTE"], BENCHMARK="CDI")
+        mod = dd = None
+        if cls in IRPF.ISENCAO:                                   # precisa das vendas do mês para a isenção
+            try:
+                mod = carrega_modulo(o["nome"])
+                dd = mod.carrega()
+            except Exception as ex:
+                print("   sem vendas para", o["nome"], ex)
+        o["classe_ir"] = cls
         for cap in pf.CAPITAIS:
             r = o[f"r{cap // 1000}"]
-            ri = apos_ir(mm, None, cap, r)
+            ri = apos_ir(mod, dd, cap, r, o["nome"]) if mod is not None else apos_ir(mm, None, cap, r, o["nome"])
             o[f"ativo_ir{cap // 1000}"] = C.anual(RB.oos(mm, ri)) - C.anual(RB.oos(mm, pf.cdi_liquido().reindex(r.index).fillna(0)))
         R = o["R20"]
         rg, mc, lq = R["resumo_grade"], R["mc"], R["leque"]["ativo OOS pp"]
         dsr = next((v for k, v in rg.items() if k.startswith("Sharpe deflacionado (1")), np.nan)
-        L.append({"arquivo": o["nome"], "fundo": o["NOME"], "aplicável": o["APLICAVEL"], "OOS desde": o["CORTE"][:7],
+        L.append({"arquivo": o["nome"], "fundo": o["NOME"], "classe IR": o["classe_ir"], "aplicável": o["APLICAVEL"], "OOS desde": o["CORTE"][:7],
                   "ativo 20k pp": o["ativo20"], "ativo 50k pp": o["ativo50"], "depois do IR 20k pp": o["ativo_ir20"], "depois do IR 50k pp": o["ativo_ir50"],
                   "IR OOS": o["ir_oos20"], "PBO %": rg["PBO %"], "Sharpe defl. %": dsr, "P(bater 3a) %": mc.loc["P(bater o benchmark) %", "3 ano(s)"],
                   "leque p5": lq.quantile(.05), "leque P(>0) %": (lq > 0).mean() * 100, "custo 2x": R["custo"].get("2x"), "exec t+2": R["atraso"].get("t+2"),
                   "walk-forward": R["wf_ativo"], "sem 10 melhores": R["sem_maiores"].get("sem os 10 melhores"),
                   "placebo p": R["placebo"]["p-valor (fração de placebos >= real)"], "truncamento ok": bool(R["truncamento"]["passou"].all())})
     t = pd.DataFrame(L)
+    t["auditoria"] = t["arquivo"].map(lambda a: AUDITORIA.get(a, ("não auditado", ""))[0])
+    t["motivo auditoria"] = t["arquivo"].map(lambda a: AUDITORIA.get(a, ("", ""))[1])
     t["aplicável"] = t["aplicável"].map(lambda v: v if isinstance(v, (bool, np.bool_)) else not str(v).strip().lower().startswith(("false", "nao", "não", "no")))
-    ok = (t["aplicável"].astype(bool) & t["truncamento ok"].astype(bool)).astype(float)
+    ok = (t["aplicável"].astype(bool) & t["truncamento ok"].astype(bool) & ~t["auditoria"].isin(["REPROVADO", "BETA", "SUBSTITUÍDO"])).astype(float)
     pos = (t["depois do IR 20k pp"] > 0).astype(float)
     rob = ((t["custo 2x"] > 0).astype(float) + (t["exec t+2"] > 0).astype(float) + (t["sem 10 melhores"] > 0).astype(float)) / 3
     t["nota"] = ok * (.20 * t["IR OOS"].fillna(-9).rank(pct=True) + .20 * t["P(bater 3a) %"].fillna(0) / 100 + .15 * t["leque P(>0) %"].fillna(0) / 100
@@ -198,8 +267,18 @@ def top5(nomes):
             r = C.CDI.reindex(E.index) + E @ w
             corte = max(cortes.values())
             mm = types.SimpleNamespace(BENCHMARK="CDI", CORTE=str(corte.date()), INICIO=str(E.index[0].date()))
-            ri = pf.cdi_liquido().reindex(r.index).fillna(0) + sum(
-                (apos_ir(mods[n], dados[n], cap * w[n], fat[n]) - pf.cdi_liquido().reindex(fat[n].index).fillna(0)).reindex(r.index).fillna(0) * w[n] for n in nomes)
+            # IR da carteira: agrega o P&L e as vendas de ações por CLASSE (a isenção de R$ 20 mil vale para a soma das vendas de ações no
+            # mês do mesmo CPF, não por fundo); cada classe é tributada pelas suas regras sobre o P&L agregado.
+            por_classe, vend_classe = {}, {}
+            for n in nomes:
+                cls = classe_ir(n, mods[n])
+                por_classe[cls] = por_classe.get(cls, 0) + E[n] * w[n] * cap
+                if cls in IRPF.ISENCAO:
+                    vm = vendas(mods[n], dados[n], cap * w[n])
+                    if vm is not None:
+                        vend_classe[cls] = vend_classe.get(cls, 0) + vm
+            ex_ir = sum(IRPF.imposto_excesso(pnl / cap, cap, cls, vend_classe.get(cls)) for cls, pnl in por_classe.items())
+            ri = pf.cdi_liquido().reindex(r.index).fillna(0) + ex_ir.reindex(r.index).fillna(0)
             o = C.metricas(RB.oos(mm, r), C.CDI)
             ci = RB.oos(mm, pf.cdi_liquido().reindex(r.index).fillna(0))
             saida[(cap, L)] = {"reais por fundo": {n: round(cap * w[n]) for n in nomes}, "OOS a.a. %": o["retorno a.a. %"], "CDI %": o["benchmark a.a. %"],

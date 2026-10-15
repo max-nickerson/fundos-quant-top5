@@ -18,6 +18,8 @@ ela só conta como executada se o fracionário negociou ACIMA (venda) / ABAIXO (
 do dia (compro no maior, vendo no menor). Até `n_max` operações por dia (as de maior prêmio), 100 ações (200 com R$ 50 mil),
 só papéis até R$ 50 e com giro médio de 20 dias no lote >= `adv_min` (a perna do lote tem de ser executável). Custos: emolumentos de day trade 0,023% por perna. IR: day trade 20%. Capital fica no CDI (garantia em Tesouro
 Selic); o excesso é só o P&L das operações.
+CORREÇÃO (auditoria final): padrão perna='abertura' — fracionário tem de ABRIR além do limite (executa no limite) e a perna do lote sai
+na abertura do lote (simultânea), pagando o meio spread do fechamento de t. perna='fechamento' = versão original (não simultânea).
 Ressalva honesta: o COTAHIST não informa a quantidade na melhor oferta nem o horário; a regra de execução exige que o preço tenha sido
 ultrapassado no dia seguinte, o que é o mínimo para a ordem ter sido executada.
 """
@@ -34,14 +36,20 @@ TESE = ("Vendo 100 ações no fracionário quando o varejo ali paga mais do que 
 BENCHMARK = "CDI"
 INICIO, CORTE = "2014-06-01", "2021-01-01"
 REGIME = "nenhum"
+CLASSE_IR = "day_trade"                                   # day trade: 20%
 CUSTO_TROCA = .001
 PARAMS = {"limiar": .01, "lado": "ambos", "qmin": 1000, "n_max": 5, "preco_max": 50.0, "adv_min": 1e6}
 GRADE = {"limiar": [.005, .01, .02], "lado": ["ambos", "vende_frac"], "adv_min": [2e5, 2e6]}
 VIZINHANCA = {"limiar": (.004, .03), "qmin": (300, 3000), "n_max": (2, 8), "adv_min": (3e5, 5e6)}
 INSTRUMENTOS = [{"onde": "Clear/Rico/XP (conta com day trade)", "ticker": "ações com fracionário ativo", "lote": "100 ações (fracionário 1-99 + 1 ordem)",
                  "custo": "emolumentos de day trade 0,023% por perna; corretagem zero"}]
-APLICAVEL = True
-MOTIVO = ("exige conta de day trade e venda a descoberto intradiária no fracionário (permitida em Clear/Rico para papéis líquidos; restrita em "
+APLICAVEL = False
+MOTIVO = ("NÃO TESTÁVEL HONESTAMENTE com o COTAHIST (auditoria final, ver pf/pesquisa/correcoes_finais.md): o arquivo não tem horário nem "
+          "quantidade das ofertas dos dois livros. A versão original (+9,7 pp OOS) vendia no fracionário a qualquer hora e recomprava o lote "
+          "no FECHAMENTO: o P&L era o movimento intradiário de small caps (AZEV3 +104% num dia), não o prêmio. Com as duas pernas "
+          "simultâneas na abertura (único instante comum) e execução no limite, o edge fica perto de zero e o resultado depende de "
+          "premissa não verificável (preço do leilão de abertura do fracionário com a minha ordem dentro). Além disso: "
+          "exige conta de day trade e venda a descoberto intradiária no fracionário (permitida em Clear/Rico para papéis líquidos; restrita em "
           "papéis pequenos) e automação (MetaTrader/Profit) para deixar várias ordens por dia")
 ALAVANCAGENS = [1, 1.5, 2]
 MOTIVO_ALAV = "day trade usa margem pequena; dobrar o nº de lotes é possível, mas a fila do fracionário limita (a execução simulada já é otimista)"
@@ -49,20 +57,22 @@ _RES = {}
 
 
 def carrega():
-    d = B.painel("P", "BID", "ASK", "V")
+    d = B.painel("P", "BID", "ASK", "V", "O")
     f = B.ler("fracionario")
     f = f[f.ticker.isin(d["P"].columns)].copy()
     d["frac"] = f
     return d
 
 
-def _eventos(d, limiar, lado, qmin, n_max, preco_max, lag, adv_min, fill="limite"):
+def _eventos(d, limiar, lado, qmin, n_max, preco_max, lag, adv_min, fill="limite", perna="abertura"):
     f = d["frac"]
     idx = B.DIAS
     i = idx.get_indexer(pd.to_datetime(f.data))
     f = f.assign(i=i)[i >= 0]
-    P, BID, ASK = d["P"], d["BID"], d["ASK"]
-    adv = d["V"].reindex(P.index).fillna(0).rolling(20, min_periods=10).mean().values
+    # painéis SEMPRE no calendário completo: com dados cortados (teste de truncamento) as matrizes ficam mais curtas que B.DIAS e o
+    # índice t+1 (ie) estourava a matriz (IndexError 3476). Depois do corte os preços viram NaN e o negócio não é executado.
+    P, BID, ASK, O = (d[k].reindex(idx) for k in ("P", "BID", "ASK", "O"))
+    adv = d["V"].reindex(idx).fillna(0).rolling(20, min_periods=10).mean().values
     cols = {t: k for k, t in enumerate(P.columns)}
     j = f.ticker.map(cols).values
     ii = f.i.values
@@ -88,12 +98,27 @@ def _eventos(d, limiar, lado, qmin, n_max, preco_max, lag, adv_min, fill="limite
     ev["max_f"], ev["min_f"], ev["q_f"], ev["ab_f"] = x.max_f.values, x.min_f.values, x.quantidade_f.values, x.abertura_f.values
     ie, jj = ev.ie.values, ev.j.values
     ev["p_l"], ev["b_l"], ev["a_l"] = P.values[ie, jj], BID.values[ie, jj], ASK.values[ie, jj]
-    vend = (ev.lado == -1) & (ev.max_f >= ev.lim + .01)
-    comp = (ev.lado == 1) & (ev.min_f <= ev.lim - .01)
-    ev = ev[(vend | comp) & (ev.q_f >= qmin) & (ev.p_l > 0)].copy()
-    # outra perna no lote: pior entre fechamento e oferta do fim do dia
-    pior_compra = np.fmax(ev.p_l, ev.a_l.fillna(ev.p_l))
-    pior_venda = np.fmin(ev.p_l, ev.b_l.fillna(ev.p_l))
+    if perna == "abertura":
+        # CORREÇÃO (auditoria final): as duas pernas têm de ser SIMULTÂNEAS. O único instante em que o COTAHIST dá preço dos dois livros
+        # ao mesmo tempo é a abertura: a ordem limitada só conta se o fracionário ABRIU além do limite (executa no limite) e a perna do
+        # lote sai na abertura do lote (O) pagando o meio spread do fechamento de t (conhecido). Na versão 'fechamento' (original) a venda
+        # no fracionário acontecia a qualquer hora e a recompra no fechamento: o P&L era o movimento intradiário de small caps
+        # (AZEV3 +104% em 28/08/2026, SIMH3 -50%), não o prêmio.
+        ev["o_l"] = O.values[ie, jj]
+        hs = ((ASK - BID) / (ASK + BID)).where((ASK > BID) & (BID > 0)).values[ev.i.values, jj]
+        ev["hs"] = np.nan_to_num(np.clip(hs, 0, .05), nan=.005)
+        vend = (ev.lado == -1) & (ev.ab_f >= ev.lim + .01)
+        comp = (ev.lado == 1) & (ev.ab_f <= ev.lim - .01)
+        ev = ev[(vend | comp) & (ev.q_f >= qmin) & (ev.o_l > 0)].copy()
+        pior_compra = ev.o_l * (1 + ev.hs)
+        pior_venda = ev.o_l * (1 - ev.hs)
+    else:
+        vend = (ev.lado == -1) & (ev.max_f >= ev.lim + .01)
+        comp = (ev.lado == 1) & (ev.min_f <= ev.lim - .01)
+        ev = ev[(vend | comp) & (ev.q_f >= qmin) & (ev.p_l > 0)].copy()
+        # outra perna no lote: pior entre fechamento e oferta do fim do dia (NÃO simultânea: exposição intradiária)
+        pior_compra = np.fmax(ev.p_l, ev.a_l.fillna(ev.p_l))
+        pior_venda = np.fmin(ev.p_l, ev.b_l.fillna(ev.p_l))
     # ordem limitada deixada antes da abertura: se o fracionário abre além do limite, executa no preço de abertura (melhor que o limite)
     # (sensibilidade 'abertura'; o padrão 'limite' é conservador: com a minha ordem no leilão de abertura, o preço poderia cair até o limite)
     px = ev.lim.values if fill == "limite" else np.where(ev.lado == -1, np.fmax(ev.lim, ev.ab_f.fillna(0)), np.fmin(ev.lim, ev.ab_f.fillna(np.inf)))
@@ -103,11 +128,11 @@ def _eventos(d, limiar, lado, qmin, n_max, preco_max, lag, adv_min, fill="limite
 
 
 def roda(d, capital=20000, custo_mult=1, lag=0, limiar=.01, lado="ambos", qmin=1000, n_max=5, preco_max=50.0, adv_min=1e6, alavancagem=1.0,
-         fill="limite"):
-    key = (id(d), capital, custo_mult, lag, limiar, lado, qmin, n_max, preco_max, adv_min, alavancagem, fill)
+         fill="limite", perna="abertura"):
+    key = (id(d), capital, custo_mult, lag, limiar, lado, qmin, n_max, preco_max, adv_min, alavancagem, fill, perna)
     if key in _RES:
         return _RES[key]
-    ev = _eventos(d, limiar, lado, int(qmin), int(n_max), preco_max, lag, adv_min, fill)
+    ev = _eventos(d, limiar, lado, int(qmin), int(n_max), preco_max, lag, adv_min, fill, perna)
     lotes = (100 if capital < 50000 else 200) * alavancagem
     ev["qtd"] = np.floor(lotes / 100) * 100
     ev["notional"] = ev.qtd * ev.lim

@@ -13,6 +13,10 @@ desde 10/2020) contra BTCUSDT x dólar: prêmio médio de 0,6-0,7% (dp 0,5-0,8%)
 IOF/remessa que o brasileiro evita comprando cripto em reais; caiu de 1,6% (2019) para 0,25% (2026). Não há kimchi de 5-10% como na
 Coreia, porque o real é conversível via USDT; o prêmio vira só um sinal de demanda local (usado no gl_cripto_tendencia).
 
+CORREÇÃO (auditoria final): a ordem em "justo de ontem x (1 - thr)" só executava quando o próprio cripto caía no dia (desconto de
+entrada sempre -2,47%) — era comprar a queda, não o desconto. Agora (execucao='fechamento', padrão) o desconto é medido no MESMO
+instante (oferta de venda do ETF no fechamento x justo do candle de 1h que fecha no fechamento da B3), executado em t+1 na oferta de
+venda e vendido na oferta de compra quando o desconto fecha. BIT vazio antes da listagem -> sem hedge (antes: erro de argmax no truncamento).
 Custos: emolumentos 0,03% (limitada); saída forçada paga meio spread do fechamento. ETFs têm taxa de administração no preço.
 IR: ETF na B3 15% (etf_b3), sem isenção; BIT 15% (futuros_b3). Dados de BTC-BRL a cada hora só desde 2019 -> INICIO 2021-07-01
 (listagem dos ETFs), CORTE 2023-01-01.
@@ -27,6 +31,7 @@ TESE = "Ordem de compra parada abaixo do NAV dos ETFs de bitcoin/ether da B3; ve
 BENCHMARK = "CDI"
 INICIO, CORTE = "2021-07-01", "2023-01-01"
 REGIME = "nenhum"
+CLASSE_IR = "etf_b3"                                   # ETF na B3: 15%, sem isenção
 CUSTO_TROCA = .001
 PARAMS = {"thr": .025, "max_dias": 3, "hedge": "bit"}         # maior IR dentro da amostra (todas negativas no IS)
 GRADE = {"thr": [.01, .015, .025], "max_dias": [1, 3], "hedge": ["nenhum", "bit"]}
@@ -54,6 +59,9 @@ def bit_continuo(f):
     """Retorno diário do BIT segurando o contrato mais negociado da véspera (sem salto de rolagem) e o contrato do dia."""
     A = f.pivot_table(index="data", columns="ticker", values="AdjstdQt", aggfunc="last").reindex(G.DIAS)
     Q = f.pivot_table(index="data", columns="ticker", values="FinInstrmQty", aggfunc="last").reindex(G.DIAS)
+    if A.shape[1] == 0:                       # BIT ainda não listado (dados cortados antes de 2021/2022): sem hedge possível
+        vazio = pd.Series(np.nan, index=G.DIAS)
+        return vazio, vazio
     ct = Q.fillna(-1).idxmax(axis=1).where(Q.notna().any(axis=1)).ffill()
     ct_ant = ct.shift(1)
     r = pd.Series([A.at[t, c] / A.at[p, c] - 1 if isinstance(c, str) and c in A and p is not None else np.nan
@@ -77,7 +85,9 @@ def _painel(d):
     return V, U, justo, hs, ref
 
 
-def _simula(d, thr, max_dias, hedge, capital, custo_mult=1, lag=0):
+def _simula(d, thr, max_dias, hedge, capital, custo_mult=1, lag=0, execucao="fechamento"):
+    if execucao == "fechamento":
+        return _simula_fech(d, thr, max_dias, hedge, capital, custo_mult, lag)
     V, U, J, HS, ref = _painel(d)
     tk = list(ETFS)
     O, H, L, F = (V[c][tk].values for c in ("abertura", "max", "min", "fech"))
@@ -148,6 +158,93 @@ def _simula(d, thr, max_dias, hedge, capital, custo_mult=1, lag=0):
         hedge_pnl = ((n.shift(1).fillna(0) * noc1.shift(1) * r).fillna(0)
                      - (n.diff().abs().fillna(0) * noc1 * BIT_CUSTO * custo_mult).fillna(0))
     return f(pnl), f(cus), f(car), hedge_pnl, pd.DataFrame(neg)
+
+
+def _hedge_bit(d, btc_expo, lag, custo_mult):
+    r, nivel = bit_continuo(d["bit"])
+    mult = pd.Series([BIT_MULT(t) for t in G.DIAS], index=G.DIAS)
+    noc1 = nivel * mult
+    n = -(pd.Series(btc_expo, index=G.DIAS) / noc1).round().fillna(0)          # decidido no fechamento de i (posição já conhecida)
+    n = n.shift(lag).fillna(0)
+    return ((n.shift(1).fillna(0) * noc1.shift(1) * r).fillna(0) - (n.diff().abs().fillna(0) * noc1 * BIT_CUSTO * custo_mult).fillna(0))
+
+
+def _simula_fech(d, thr, max_dias, hedge, capital, custo_mult=1, lag=0, base=1):
+    """CORREÇÃO (auditoria final). A versão original deixava a ordem em K = justo de ONTEM x (1 - thr): a 'compra com desconto' só
+    acontecia quando o próprio bitcoin caía 2,5% no dia (todo desconto de entrada saía exatamente -2,47%) — era comprar a queda do
+    cripto, não o desconto do ETF. Aqui o desconto é medido SIMULTANEAMENTE: no fechamento do dia i, oferta de venda do ETF contra o
+    justo do MESMO instante (BTC/ETH-BRL do candle de 1h que fecha no fechamento da B3 x razão mediana até a véspera). Ordem de
+    compra limitada atrelada ao justo ao vivo (atualizada antes do call de fechamento): compra na OFERTA DE VENDA do fechamento
+    (não no último preço) se ela <= justo x e^-thr; com lag k compra no fechamento de i+k pela oferta de venda desse dia. Saída: vende
+    na OFERTA DE COMPRA do fechamento quando ela >= justo do mesmo instante (desconto fechou) ou depois de `max_dias` pregões.
+    Marca a mercado no fechamento; dinheiro no ETF não rende CDI.
+    EXECUÇÃO t+1 (regra do dono): o sinal do fechamento de i é executado no fechamento de i+1+lag (base=1). base=0 = ordem atrelada ao
+    justo ao vivo executada no MESMO call (sensibilidade; o desconto só existe aí — ver caderno correcoes_finais.md)."""
+    V, U, J, HS, ref = _painel(d)
+    tk = list(ETFS)
+    F = V["fech"][tk].values
+    hs = HS[tk].values
+    AS = np.where(V["oferta_venda"][tk].values > 0, V["oferta_venda"][tk].values, F * (1 + hs))
+    BI = np.where(V["oferta_compra"][tk].values > 0, V["oferta_compra"][tk].values, F * (1 - hs))
+    Jv = J[tk].values
+    ok = (V["negocios"][tk].fillna(0).values > 0) & (F > 0) & (Jv > 0)
+    sinal = ok & (AS <= Jv * np.exp(-thr))
+    fechou = ok & (BI >= Jv)
+    T, N = F.shape
+    pnl, cus, car = np.zeros((T, N)), np.zeros((T, N)), np.zeros((T, N))
+    cdi = G.CDI.reindex(G.DIAS).fillna(0).values
+    neg, btc_expo = [], np.zeros(T)
+    ini = G.DIAS.searchsorted(pd.Timestamp(INICIO))
+    for j in range(N):
+        i = ini
+        while i < T:
+            if not sinal[i, j]:
+                i += 1
+                continue
+            ie = i + base + lag
+            if ie >= T or not (F[ie, j] > 0) or not (AS[ie, j] > 0):
+                i += 1
+                continue
+            px = AS[ie, j]
+            n = np.floor(PESO * capital / px)
+            if n < 1:
+                i += 1
+                continue
+            c0 = n * px * G.B3_EMOL * custo_mult
+            pnl[ie, j] += n * (F[ie, j] - px)
+            cus[ie, j] += c0
+            acc, ref_p, ix, mot = n * (F[ie, j] - px) - c0, F[ie, j], None, ""
+            k = ie + 1
+            while k < T:
+                car[k, j] -= n * ref_p * cdi[k]
+                acc -= n * ref_p * cdi[k]
+                if F[k, j] > 0:
+                    pnl[k, j] += n * (F[k, j] - ref_p)
+                    acc += n * (F[k, j] - ref_p)
+                    ref_p = F[k, j]
+                dec = k - base - lag                                      # decisão de saída em dec, execução em k
+                if dec >= ie and (fechou[dec, j] or dec - ie >= max_dias) and F[k, j] > 0 and BI[k, j] > 0:
+                    sai = BI[k, j]
+                    pnl[k, j] += n * (sai - ref_p)
+                    c1 = n * sai * G.B3_EMOL * custo_mult
+                    cus[k, j] += c1
+                    acc += n * (sai - ref_p) - c1
+                    ix, mot = k, ("desconto fechou" if fechou[dec, j] else "prazo")
+                    break
+                k += 1
+            for kk in range(ie, (ix if ix is not None else T)):
+                if ETFS[tk[j]] == "BTC":
+                    btc_expo[kk] += n * F[kk, j] if F[kk, j] > 0 else 0
+            neg.append({"ativo": tk[j], "lado": 1, "entrada": G.DIAS[ie], "saida": G.DIAS[ix] if ix is not None else G.DIAS[-1],
+                        "dias": (ix if ix is not None else T - 1) - ie, "retorno_%": ((BI[ix, j] if ix is not None else ref_p) / px - 1) * 100,
+                        "desconto_entrada_%": (AS[i, j] / Jv[i, j] - 1) * 100, "contrib_pp": acc / capital * 100,
+                        "saida_motivo": mot or "aberta"})
+            if ix is None:
+                break
+            i = ix + 1
+    f = lambda a: pd.DataFrame(a, index=G.DIAS, columns=tk)
+    h = _hedge_bit(d, btc_expo, lag, custo_mult) if hedge == "bit" else pd.Series(0.0, index=G.DIAS)
+    return f(pnl), f(cus), f(car), h, pd.DataFrame(neg)
 
 
 def excesso(d, capital=20000, custo_mult=1, lag=0, regime=REGIME, alavancagem=1, **params):

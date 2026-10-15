@@ -29,6 +29,7 @@ TESE = ("Compro o alvo de OPA em dinheiro depois do fato relevante e entrego no 
 BENCHMARK = "CDI"
 INICIO, CORTE = "2014-03-01", "2021-01-01"
 REGIME = "nenhum"
+CLASSE_IR = "acoes_isentas"                                   # vendas de R$ 3-7,5 mil por OPA ficam abaixo de R$ 20 mil/mês (isento, Lei 11.033/2004 art. 3º)
 CUSTO_TROCA = .001
 PARAMS = {"smin": 0.0, "modo": "leilao", "prazo": 300, "adv_min": 2e4, "por_opa": 3000.0}
 GRADE = {"smin": [-.03, 0.0, .03], "modo": ["leilao", "spread"]}
@@ -57,8 +58,10 @@ def roda(d, capital=20000, custo_mult=1, lag=0, smin=0.0, modo="leilao", prazo=3
     key = (id(d), capital, custo_mult, lag, smin, modo, prazo, adv_min, por_opa)
     if key in _RES:
         return _RES[key]
-    P, R, V, HS, BI = d["P"], d["R"].fillna(0), d["V"].fillna(0), d["HS"], d["BID"]
     idx = B.DIAS
+    # painéis no calendário completo (com dados truncados as séries ficavam mais curtas que B.DIAS -> iloc fora do intervalo)
+    P, R, V, HS, BI = (d[k].reindex(idx) for k in ("P", "R", "V", "HS", "BID"))
+    R, V = R.fillna(0), V.fillna(0)
     T = len(idx)
     prazo = int(prazo)
     adv = V.rolling(60, min_periods=10).mean()
