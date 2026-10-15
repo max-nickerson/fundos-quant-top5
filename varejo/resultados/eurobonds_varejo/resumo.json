@@ -1,0 +1,19 @@
+{
+ "variantes": 9.0,
+ "PBO %": 53.57142857142857,
+ "% variantes que batem o benchmark OOS": 0.0,
+ "mediana das variantes OOS pp": -8.12504709860682,
+ "Sharpe deflacionado (grade) %": 23.13433054504317,
+ "Sharpe deflacionado (109 estratégias x grade) %": 14.292742149708715,
+ "excesso bruto OOS real pp": -3.062415073655835,
+ "placebo mediana pp": 0.0,
+ "placebo p95 pp": 7.240508696064697,
+ "p-valor (fração de placebos >= real)": 0.915,
+ "fundo líquido de IR a.a. %": 8.24451472497918,
+ "CDI líquido de IR a.a. %": 11.098703797149811,
+ "ativo líquido de IR pp": -2.854189072170632,
+ "walk-forward ativo OOS pp": -8.868434829097739,
+ "aplicavel": false,
+ "motivo": "Não aplicável: os eurobonds HY que o fundo compra têm lote mínimo de US$ 200 mil (15 bonds = US$ 3 mi) e corporativos BR na Avenue começam em US$ 50 mil; testado o substituto ETF HYEM na IBKR, sem hedge cambial (WDO de US$ 10 mil não cabe)",
+ "instrumentos": "IBKR (conta em US$; remessa com IOF 1,1% ida / 0,38% volta): HYEM (VanEck EM High Yield Bond ETF, ~US$ 19/cota, cota inteira, comissão US$ 0,005/cota mín. US$ 1); caixa em SGOV. Alternativa B3 sem remessa: BDR HYEM39 (Clear/Rico/XP, pouco líquido). Alavancagem: margem Reg T da IBKR (até 2x, conta >= US$ 2 mil)."
+}

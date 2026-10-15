@@ -6,6 +6,9 @@ crédito, commodities, opções e eventos) e a **três auditorias** de bugs e vi
 
 > Pesquisa, não recomendação de investimento. Resultados simulados com custos estimados; o passado não garante o futuro.
 
+> **Pessoa física com R$ 20 mil?** Veja [`varejo/`](varejo/README.md): os mesmos 5 fundos com instrumentos, custos, lotes, câmbio, alavancagem
+> e IR de varejo (IBKR, Clear, Rico...), mais o mapa ativo por ativo de onde cada coisa pode ser operada.
+
 ## Como rodar
 
 ```bash
@@ -87,3 +90,9 @@ CONTRATO_FUNDO.md  como escrever um fundo novo que roda na mesma bateria
 
 Fontes dos dados: B3 (COTAHIST, ajustes de futuros), Banco Central (SGS), BIS (juros de política), Yahoo Finance (ETFs, índices, câmbio),
 CBOE (VIX), FINRA/TradingView (preços de eurobonds). Verifique os termos de uso de cada fonte antes de redistribuir.
+
+## Correções desde a primeira versão
+- **Sharpe deflacionado**: o número de variantes usado era o número de dias (bug em `robustez.grade`); corrigido — os valores subiram.
+- **Carry de moedas**: o desconto de carry (EM, NDF, TRY) valia também para quem estava VENDIDO na moeda, que pagava menos juros do que
+  pagaria de verdade (ex.: lira vendida sem pagar o juro turco). Agora quem vende paga o carry cheio + spread. O fora da amostra não mudou
+  (+7,0 pp); o período de calibração caiu de +1,5 para +0,1 pp a.a. — ou seja, a evidência do carry é só pós-2021.

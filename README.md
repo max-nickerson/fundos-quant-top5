@@ -6,6 +6,9 @@ crédito, commodities, opções e eventos) e a **três auditorias** de bugs e vi
 
 > Pesquisa, não recomendação de investimento. Resultados simulados com custos estimados; o passado não garante o futuro.
 
+> **Pessoa física com R$ 20 mil?** Veja [`varejo/`](varejo/README.md): os mesmos 5 fundos com instrumentos, custos, lotes, câmbio, alavancagem
+> e IR de varejo (IBKR, Clear, Rico...), mais o mapa ativo por ativo de onde cada coisa pode ser operada.
+
 ## Como rodar
 
 ```bash
@@ -33,11 +36,11 @@ regime, walk-forward).
 
 | Fundo | Retorno a.a. vs bench | Ativo pp | IR | Pior queda | PBO | Sharpe defl. grade / 109 | Leque p5 / mediana / p95 | MC P(bater 3a) | Custo 2x / exec t+3 | Walk-forward | Sem 10 melhores | Placebo p | Look-ahead |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| Variância do S&P vendida (beta neutro) | 19.0% vs 11.4% | **+7.6** | 1.42 | -3.6% | 0% | 51% / 20% | +1.8 / +4.5 / +9.6 | 100% | +6.3 / +7.6 | +7.6 | +2.9 | 0.24 | ✅ |
-| Carry de moedas G10 + emergentes | 18.5% vs 11.4% | **+7.0** | 1.02 | -9.9% | 6% | 71% / 51% | +2.4 / +6.3 / +9.4 | 92% | +6.6 / +7.1 | +8.8 | +2.1 | 0.49 | ✅ |
-| Mineradoras vs metal | 23.1% vs 11.4% | **+11.7** | 1.01 | -12.8% | 25% | 97% / 95% | +5.3 / +8.6 / +12.3 | 94% | +9.7 / +7.9 | +11.7 | +8.3 | 0.00 | ✅ |
-| Rebalanceamento do Ibovespa | 13.2% vs 11.4% | **+1.8** | 0.97 | -1.1% | 26% | 90% / 81% | +0.3 / +1.7 / +1.9 | 96% | +1.6 / -0.7 | +1.8 | -0.1 | 0.01 | ✅ |
-| Eurobonds high yield Brasil com hedge | 16.7% vs 13.1% | **+3.6** | 0.44 | -3.5% | n/d | 74% / 73% | +2.2 / +3.0 / +4.9 | 90% | +3.1 / +3.8 | +4.3 | +3.5 | 0.07 | ✅ |
+| Variância do S&P vendida (beta neutro) | 19.0% vs 11.4% | **+7.6** | 1.42 | -3.6% | 0% | 99% / 71% | +1.8 / +4.5 / +9.6 | 100% | +6.3 / +7.6 | +7.6 | +2.9 | 0.24 | ✅ |
+| Carry de moedas G10 + emergentes | 18.5% vs 11.4% | **+7.0** | 1.02 | -9.9% | 12% | 98% / 92% | +2.4 / +6.4 / +9.3 | 92% | +6.9 / +7.1 | +10.1 | +2.1 | 0.49 | ✅ |
+| Mineradoras vs metal | 23.1% vs 11.4% | **+11.7** | 1.01 | -12.8% | 25% | 99% / 98% | +5.3 / +8.6 / +12.3 | 94% | +9.7 / +7.9 | +11.7 | +8.3 | 0.00 | ✅ |
+| Rebalanceamento do Ibovespa | 13.2% vs 11.4% | **+1.8** | 0.97 | -1.1% | 26% | 98% / 93% | +0.3 / +1.7 / +1.9 | 96% | +1.6 / -0.7 | +1.8 | -0.1 | 0.01 | ✅ |
+| Eurobonds high yield Brasil com hedge | 16.7% vs 13.1% | **+3.6** | 0.44 | -3.5% | n/d | 76% / 75% | +2.2 / +3.0 / +4.9 | 90% | +3.1 / +3.8 | +4.3 | +3.5 | 0.07 | ✅ |
 
 **Como ler:**
 - *ativo* = retorno acima do benchmark (pp ao ano). *IR* = ativo / tracking error.
@@ -54,10 +57,10 @@ regime, walk-forward).
 ### Carteira combinada
 Pesos pelo inverso da volatilidade de cada fundo no **seu** período de calibração, alavancada para 6% de vol (medida antes do corte).
 
-- Fora da amostra (todos os fundos já fora da amostra): **23.2% a.a. vs CDI 13.1%**, Sharpe 1.27, pior queda -6.1%; período todo: 18.0% a.a. vs 10.1%, Sharpe 1.17, pior queda -8.7%.
-- Pesos (fração do PL): variancia 0.67, carry_moedas 0.51, mineradoras 0.28, rebal_ibovespa 1.44, eurobonds 0.45
+- Fora da amostra (todos os fundos já fora da amostra): **23.2% a.a. vs CDI 13.1%**, Sharpe 1.27, pior queda -6.0%; período todo: 17.6% a.a. vs 10.1%, Sharpe 1.11, pior queda -9.3%.
+- Pesos (fração do PL): variancia 0.67, carry_moedas 0.50, mineradoras 0.28, rebal_ibovespa 1.43, eurobonds 0.45
 - Monte Carlo: P(bater o CDI) em 1 / 3 / 5 anos = 90% / 98% / 100%
-- Ativo fora da amostra sem cada fundo (re-alavancado para 6%): Variância do S&P vendida (beta neutro) +8.2 pp; Carry de moedas G10 + emergentes +9.1 pp; Mineradoras vs metal +8.3 pp; Rebalanceamento do Ibovespa +11.2 pp; Eurobonds high yield Brasil com hedge +8.6 pp
+- Ativo fora da amostra sem cada fundo (re-alavancado para 6%): Variância do S&P vendida (beta neutro) +8.1 pp; Carry de moedas G10 + emergentes +9.1 pp; Mineradoras vs metal +8.3 pp; Rebalanceamento do Ibovespa +11.2 pp; Eurobonds high yield Brasil com hedge +8.6 pp
 
 ## Painéis
 
@@ -115,3 +118,9 @@ CONTRATO_FUNDO.md  como escrever um fundo novo que roda na mesma bateria
 
 Fontes dos dados: B3 (COTAHIST, ajustes de futuros), Banco Central (SGS), BIS (juros de política), Yahoo Finance (ETFs, índices, câmbio),
 CBOE (VIX), FINRA/TradingView (preços de eurobonds). Verifique os termos de uso de cada fonte antes de redistribuir.
+
+## Correções desde a primeira versão
+- **Sharpe deflacionado**: o número de variantes usado era o número de dias (bug em `robustez.grade`); corrigido — os valores subiram.
+- **Carry de moedas**: o desconto de carry (EM, NDF, TRY) valia também para quem estava VENDIDO na moeda, que pagava menos juros do que
+  pagaria de verdade (ex.: lira vendida sem pagar o juro turco). Agora quem vende paga o carry cheio + spread. O fora da amostra não mudou
+  (+7,0 pp); o período de calibração caiu de +1,5 para +0,1 pp a.a. — ou seja, a evidência do carry é só pós-2021.

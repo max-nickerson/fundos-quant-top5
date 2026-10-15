@@ -1,0 +1,19 @@
+{
+ "variantes": 6.0,
+ "PBO %": 5.555555555555555,
+ "% variantes que batem o benchmark OOS": 50.0,
+ "mediana das variantes OOS pp": 0.0009970075032788017,
+ "Sharpe deflacionado (grade) %": 66.58183780145893,
+ "Sharpe deflacionado (109 estratégias x grade) %": 23.29198672773689,
+ "excesso bruto OOS real pp": 2.198222644670045,
+ "placebo mediana pp": -0.01395757589821578,
+ "placebo p95 pp": 0.7360102841717326,
+ "p-valor (fração de placebos >= real)": 0.005,
+ "fundo líquido de IR a.a. %": 10.757959109086702,
+ "CDI líquido de IR a.a. %": 9.727706429189142,
+ "ativo líquido de IR pp": 1.0302526798975595,
+ "walk-forward ativo OOS pp": 1.21328969900385,
+ "aplicavel": true,
+ "motivo": "Aplicável: ações de mid caps em fracionário com corretagem zero; o hedge em WIN não cabe (1 contrato ~R$ 40 mil > exposição), então na prática com R$ 20 mil o fundo fica SEM hedge (risco de Ibovespa nos ~10 dias de posição)",
+ "instrumentos": "Clear/Rico/Inter (corretagem zero): ~4 entrantes do Ibovespa por revisão (jan/mai/set), 1/15 do capital cada (~R$ 1,3 mil com R$ 20 mil -> fracionário, ticker XXXX3F, 1 ação mínima), compra 10 pregões antes e venda no leilão de fechamento do último pregão da carteira velha; resto em Tesouro Selic/LFTS11. Hedge: WINxxx vendido (R$ 0,20 x pontos, margem ~R$ 6-10 mil/contrato) só quando a exposição >= meio contrato; alternativa BOVA11 vendido via aluguel (Rico/XP; garantia ~125%). Alavancagem: termo (XP/Rico)."
+}

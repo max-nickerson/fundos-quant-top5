@@ -1,0 +1,579 @@
+
+====================================================================================================
+>>> Variância do S&P vendida (beta neutro) — varejo (R$ 20,000)
+aplicável: swap de variância não é de varejo; o substituto operável com R$ 20 mil é SVXY + SH na IBKR (frações de ação), mas o prêmio do futuro de VIX é bem menor que o do swap e o dólar sem hedge pesa
+instrumentos: IBKR (conta cash ou margem; ações fracionárias): COMPRAR SVXY (ProShares −0,5x futuros de VIX; ~US$ 64) com ~10-25% do capital e SH (−1x S&P; ~US$ 32) no valor beta x SVXY; caixa lá fora em SGOV. Remeter só ~30% do capital; o resto em Tesouro Selic. Rebalancear só se a posição se afastar >50% do alvo; comissão IBKR Pro tiered. Alternativas testadas: VXM (Cboe, US$ 100 x VIX, margem ~US$ 750-860 por contrato -> 1 contrato ≈ 45% de R$ 20 mil, grande demais), opções XSP (1 iron butterfly ≈ US$ 1,8 mil de risco; 1 iron condor ≈ US$ 6 mil; 1 put ATM ≈ US$ 13 mil de margem).
+   base ok (0s)
+   grade ok (1s)
+   leque ok (7s)
+   truncamento ok (10s)
+   pronto (12s)
+                       total  dentro da amostra  fora da amostra
+retorno a.a. %          9.59               9.69             9.38
+benchmark a.a. %       10.07               9.46            11.44
+ativo a.a. pp          -0.47               0.23            -2.06
+vol a.a. %              5.01               5.25             4.41
+Sharpe                 -0.06               0.07            -0.40
+IR vs bench            -0.06               0.07            -0.40
+pior queda %           -6.80              -6.80            -5.27
+meses batendo bench %  46.46              48.72            41.43
+assimetria             -0.06              -0.09             0.01
+pior dia %             -3.29              -3.29            -1.40
+
+-- robustez: variantes: 12.0, PBO %: 29.4, % variantes que batem o benchmark OOS: 0.0, mediana das variantes OOS pp: -9.5, Sharpe deflacionado (grade) %: 6.6, Sharpe deflacionado (109 estratégias x grade) %: 2.0
+-- leque: p5 -3.8 | mediana -2.5 | p95 -1.6 | P(>0) 0%
+-- custo
+0x     -1.47
+0.5x   -1.76
+1x     -2.06
+1.5x   -2.36
+2x     -2.65
+3x     -3.33
+-- atraso
+t+1   -2.06
+t+2   -1.74
+t+3   -1.68
+t+4   -2.40
+t+6   -2.40
+-- Monte Carlo
+                          1 ano(s)  3 ano(s)  5 ano(s)
+P(bater o benchmark) %       32.52     21.26     14.46
+ativo a.a. p5 pp             -8.36     -5.60     -4.81
+ativo a.a. mediana pp        -1.75     -1.87     -1.86
+ativo a.a. p95 pp             4.91      2.00      1.10
+pior queda relativa p5 %     -9.99    -18.34    -24.37
+-- look-ahead (truncamento)
+           dias comparados maior diferença diária passou
+2014-07-28            1651                    0.0   True
+2019-04-09            2830                    0.0   True
+2023-12-19            4010                    0.0   True
+-- placebo {'excesso bruto OOS real pp': np.float64(0.977), 'placebo mediana pp': 0.433, 'placebo p95 pp': 1.671, 'p-valor (fração de placebos >= real)': 0.2}
+-- melhores negócios
+              ativo  lado    entrada      saida  dias  retorno_%  contrib_pp
+câmbio+caixa+custos     1 2008-09-01 2008-09-30    21        NaN        4.55
+câmbio+caixa+custos     1 2011-09-01 2011-09-30    21        NaN        4.46
+câmbio+caixa+custos     1 2020-03-01 2020-03-31    21        NaN        4.24
+câmbio+caixa+custos     1 2008-10-01 2008-10-31    21        NaN        3.28
+               svxy    -1 2012-03-01 2012-03-31    21      32.08        3.18
+câmbio+caixa+custos     1 2015-03-01 2015-03-31    21        NaN        2.97
+               svxy    -1 2011-04-01 2011-04-30    21      23.95        2.78
+câmbio+caixa+custos     1 2008-11-01 2008-11-30    21        NaN        2.78
+-- piores negócios
+              ativo  lado    entrada      saida  dias  retorno_%  contrib_pp
+               svxy    -1 2018-02-01 2018-02-28    21    -123.12       -5.96
+câmbio+caixa+custos     1 2016-06-01 2016-06-30    21        NaN       -3.80
+               svxy    -1 2010-05-01 2010-05-31    21    -109.75       -3.79
+câmbio+caixa+custos     1 2016-03-01 2016-03-31    21        NaN       -3.63
+               svxy    -1 2007-11-01 2007-11-30    21     -34.26       -3.23
+câmbio+caixa+custos     1 2009-05-01 2009-05-31    21        NaN       -3.18
+câmbio+caixa+custos     1 2011-10-01 2011-10-31    21        NaN       -3.12
+câmbio+caixa+custos     1 2022-03-01 2022-03-31    21        NaN       -2.82
+-- quem trouxe o retorno
+                       sum  count
+ativo                            
+svxy                 46.69    224
+hedge S&P           -24.58    224
+câmbio+caixa+custos -25.03    230
+-- concentração
+sem os 1 melhores    -2.52
+sem os 3 melhores    -3.40
+sem os 5 melhores    -4.14
+sem os 10 melhores   -5.53
+sem os 1 piores      -1.57
+sem os 3 piores      -0.85
+sem os 5 piores      -0.22
+-- regime
+              ativo IS pp  ativo OOS pp  IR OOS  pior queda %
+risco_global         0.23         -2.06   -0.40         -6.80
+nenhum              -0.12         -1.51   -0.27        -11.78
+-- walk-forward: -2.63 pp
+-- tamanho do capital (ativo OOS antes do IR, pp)
+R$ 5.000       -2.65
+R$ 10.000      -2.26
+R$ 20.000      -2.06
+R$ 50.000      -2.91
+R$ 100.000     -2.86
+R$ 1.000.000   -2.82
+-- alavancagem (todas são operáveis: alavancar = remeter mais (30% -> 45/60/100% do capital) e comprar mais SVXY; 5x usa margem Reg T (conta >= US$ 2 mil). Sem chamada de margem nem quebra (o teto e a vol-alvo limitam o SVXY a <= 1x o capital), mas a 5x fev/2018 custa −21% do capital e o dólar sem hedge sobre 100% do capital domina; VXM 5x idem (−25% em fev/2018))
+     ativo OOS pp ativo total pp  vol OOS % pior queda total % quebrou chamadas de margem datas das chamadas quebrou em exposição média ao veículo OOS (% capital) % dias com posição OOS fração remetida
+1x      -2.060903       -0.47376   4.408027          -6.795636   False                  0                             -                                  11.574887              94.352617             0.3
+1.5x    -2.959299      -0.804009   6.610525         -10.505249   False                  0                             -                                  17.363677              94.352617            0.45
+2x      -5.606743      -1.626067   9.351653         -15.564148   False                  0                             -                                  28.740157              94.352617             0.6
+5x      -7.791464      -1.833679  17.948521         -35.644647   False                  0                             -                                  67.719237              94.352617             1.0
+-- depois do IR (15% nos dois lados)
+   fundo líquido de IR a.a. %: 7.98
+   CDI líquido de IR a.a. %: 9.73
+   ativo líquido de IR pp: -1.75
+
+====================================================================================================
+>>> Carry de moedas G10 + emergentes (varejo) (R$ 20,000)
+NÃO aplicável: Com R$ 20 mil o carry não sobrevive: micro futuros (US$ 6,5–15 mil/contrato) e WDO (US$ 10 mil) não cabem nas pernas de ~US$ 1 mil (zero contratos = CDI); FX à vista inverte o carry (conta < US$ 10 mil não recebe juros e paga BM+1,5% no vendido); ETFs montam o livro mas exigem ~77% do capital em dólar sem hedge, que custa ~8 pp a.a. de CDI - T-bill.
+instrumentos: Via ETF (padrão): IBKR Pro — compra/venda FXE, FXB, FXA, FXC, FXF, FXY (CurrencyShares, 0,40%) e CEW (cesta EM via forwards, 0,55%) no lugar das pernas emergentes; venda a descoberto só em conta margem (mín. US$ 2.000), ações inteiras, aluguel ~0,5% (CEW 2%), Reg T 50% inicial / 25–30% manutenção; abaixo de US$ 2 mil só as pernas compradas (conta caixa). Perna BRL: vender WDO na B3 (US$ 10 mil, garantia em Tesouro Selic) — nunca cabe em R$ 20 mil. Alternativas testadas: via='micro' (M6E 12.500 EUR, M6B 6.250 GBP, M6A 10.000 AUD, MCD 10.000 CAD, MSF 12.500 CHF, MJY 1,25 mi JPY; margem US$ 150–400) e via='spot' (IBKR FX).
+   base ok (0s)
+   grade ok (3s)
+   leque ok (29s)
+   truncamento ok (36s)
+   pronto (40s)
+                       total  dentro da amostra  fora da amostra
+retorno a.a. %          7.85               9.16             5.40
+benchmark a.a. %        9.94               9.16            11.44
+ativo a.a. pp          -2.09               0.00            -6.04
+vol a.a. %              8.17               7.70             9.01
+Sharpe                 -0.19               0.04            -0.57
+IR vs bench            -0.19               0.04            -0.57
+pior queda %          -11.74             -10.29            -9.82
+meses batendo bench %  46.04              49.24            40.00
+assimetria              0.01               0.14            -0.14
+pior dia %             -4.36              -4.36            -3.56
+
+-- robustez: variantes: 4.0, PBO %: 50.4, % variantes que batem o benchmark OOS: 0.0, mediana das variantes OOS pp: -5.5, Sharpe deflacionado (grade) %: 7.1, Sharpe deflacionado (109 estratégias x grade) %: 5.1
+-- leque: p5 -7.5 | mediana -5.9 | p95 -4.4 | P(>0) 0%
+-- custo
+0x     -6.38
+0.5x   -6.72
+1x     -6.04
+1.5x   -6.72
+2x     -7.49
+3x     -8.85
+-- atraso
+t+1   -6.04
+t+2   -6.00
+t+3   -6.67
+t+4   -6.80
+t+6   -7.97
+-- Monte Carlo
+                          1 ano(s)  3 ano(s)  5 ano(s)
+P(bater o benchmark) %       24.82     12.40      6.58
+ativo a.a. p5 pp            -16.89    -12.37    -11.05
+ativo a.a. mediana pp        -5.54     -5.59     -5.50
+ativo a.a. p95 pp             9.09      2.41      0.52
+pior queda relativa p5 %    -19.39    -35.66    -47.35
+-- look-ahead (truncamento)
+           dias comparados maior diferença diária passou
+2015-11-12            1474                    0.0   True
+2020-01-24            2528                    0.0   True
+2024-04-09            3581                    0.0   True
+-- placebo {'excesso bruto OOS real pp': np.float64(11.168), 'placebo mediana pp': 10.985, 'placebo p95 pp': 17.264, 'p-valor (fração de placebos >= real)': 0.49}
+-- melhores negócios
+ativo  lado    entrada      saida  dias  peso_medio  retorno_spot_%  carry_%  retorno_%  contrib_pp
+JPY=X    -1 2016-10-03 2026-10-14  2522        0.24           43.82    24.00      82.82       14.52
+MXN=X     1 2016-10-03 2026-04-01  2386        0.22            8.36    45.64      71.02       10.85
+BRL=X     1 2021-05-03 2026-10-14  1370        0.21            8.20    40.51      62.24       10.68
+SEK=X    -1 2014-11-03 2020-04-01  1361        0.24           28.79     7.74      39.15        8.73
+COP=X     1 2025-06-02 2026-10-14   345        0.21           29.86     4.40      35.70        7.21
+ILS=X    -1 2014-08-01 2015-03-02   145        0.25           15.76     0.19      15.98        3.55
+CHF=X    -1 2011-09-01 2014-10-01   774        0.24           16.72    -0.00      16.72        2.79
+CHF=X    -1 2008-08-01 2008-11-03    65        0.25           11.49    -0.22      11.25        2.72
+-- piores negócios
+ativo  lado    entrada      saida  dias  peso_medio  retorno_spot_%  carry_%  retorno_%  contrib_pp
+CHF=X    -1 2007-04-02 2008-04-01   251        0.25          -18.20     1.96     -16.59       -4.44
+CZK=X    -1 2010-08-02 2011-09-01   275        0.25          -11.37    -0.14     -11.50       -3.10
+CZK=X    -1 2020-06-01 2021-09-01   317        0.24          -11.81     0.41     -11.45       -2.82
+ILS=X    -1 2009-03-02 2009-09-01   128        0.24          -10.13     0.04     -10.09       -2.65
+JPY=X    -1 2015-03-02 2016-04-01   274        0.21           -6.91     0.15      -6.76       -1.79
+ZAR=X     1 2007-04-02 2022-01-03  3716        0.20          -54.69    75.95      -3.14       -1.73
+COP=X     1 2024-03-01 2024-12-02   190        0.20           -9.29     2.27      -7.20       -1.44
+CZK=X    -1 2008-02-01 2008-03-03    20        0.21           -6.24    -0.01      -6.26       -1.37
+-- quem trouxe o retorno
+            sum  count
+ativo                 
+JPY=X     13.12      3
+BRL=X     11.04      2
+MXN=X     10.85      1
+SEK=X      8.17     10
+COP=X      6.95      3
+EURUSD=X   4.21      7
+HUF=X      2.69      3
+TRY=X      2.65      1
+THB=X      1.77      4
+INR=X      0.65      3
+-- concentração
+sem os 1 melhores     -7.90
+sem os 3 melhores     -9.61
+sem os 5 melhores    -10.28
+sem os 10 melhores   -10.94
+sem os 1 piores       -5.79
+sem os 3 piores       -5.53
+sem os 5 piores       -5.33
+-- regime
+         ativo IS pp  ativo OOS pp  IR OOS  pior queda %
+dd_stop         0.00         -6.04   -0.57        -11.74
+nenhum          1.37         -5.76   -0.45        -14.61
+-- walk-forward: -5.20 pp
+-- tamanho do capital (ativo OOS antes do IR, pp)
+R$ 5.000       -6.39
+R$ 10.000      -6.00
+R$ 20.000      -6.04
+R$ 50.000      -5.76
+R$ 100.000     -5.74
+R$ 1.000.000   -6.03
+-- alavancagem (Todas rodam no motor, mas: ETF é limitado pela Reg T (5x vira ~2,3x efetivo; abaixo de US$ 2 mil, conta caixa = no máximo 1x); micro futuros só têm contrato a partir de 5x (1x–2x = zero contratos); FX à vista a 5x QUEBRA em abr/2025 (choque de tarifas, iene) depois de perder o CDI todo ano.)
+     ativo OOS pp ativo total pp  vol OOS % pior queda total % quebrou
+1x      -6.043458      -2.087314   9.009514          -11.73914   False
+1.5x    -4.083838      -2.989504  10.675656         -22.789193   False
+2x      -2.148215       -4.85623  11.624931         -29.247213   False
+5x      -4.221278      -6.126872  11.837924          -28.90181   False
+-- depois do IR (15% nos dois lados)
+   fundo líquido de IR a.a. %: 4.48
+   CDI líquido de IR a.a. %: 9.73
+   ativo líquido de IR pp: -5.25
+
+====================================================================================================
+>>> Mineradoras vs metal (varejo IBKR/B3) (R$ 20,000)
+aplicável: Operável: com R$ 20 mil (~US$ 4 mil) a IBKR deixa vender a descoberto (Reg T >= US$ 2 mil) e os pares cabem em ações inteiras; com R$ 4 mil (< US$ 2 mil) só a B3 (2 pares, um sentido cada). Mas não paga: comissão mínima, venda sem juros e câmbio sem hedge levam o excesso OOS para negativo.
+instrumentos: IBKR Pro (EUA): pares GDX/GLD, GDXJ/GDX, SIL/SLV, COPX/CPER, FCX/CPER, VALE/(BHP+RIO); compra fracionária, venda a descoberto em ações inteiras (1 ação: GLD ~US$ 380, SLV ~US$ 50, CPER ~US$ 40, GDX ~US$ 85, RIO ~US$ 91); conta margem >= US$ 2 mil; margem Reg T 50% inicial, 25%/30% manutenção; caixa em SGOV. B3 (Clear/Rico/XP, conta pequena): GDXB39 comprado x GOLD11 vendido (BTC) e VALE3 vendido (BTC) x RIOT34 comprado, garantia em Tesouro Selic.
+   base ok (2s)
+   grade ok (35s)
+   leque ok (178s)
+   truncamento ok (216s)
+   pronto (225s)
+                       total  dentro da amostra  fora da amostra
+retorno a.a. %          7.41              12.81            -0.49
+benchmark a.a. %        9.84               8.82            11.44
+ativo a.a. pp          -2.43               3.99           -11.93
+vol a.a. %             17.83              17.67            18.08
+Sharpe                 -0.04               0.29            -0.54
+IR vs bench            -0.04               0.29            -0.54
+pior queda %          -42.55             -36.57           -42.55
+meses batendo bench %  47.75              51.85            41.43
+assimetria              0.49               0.07             1.10
+pior dia %             -6.25              -6.14            -6.25
+
+-- robustez: variantes: 12.0, PBO %: 67.1, % variantes que batem o benchmark OOS: 0.0, mediana das variantes OOS pp: -12.5, Sharpe deflacionado (grade) %: 6.4, Sharpe deflacionado (109 estratégias x grade) %: 3.7
+-- leque: p5 -13.9 | mediana -12.5 | p95 -10.5 | P(>0) 0%
+-- custo
+0x      -7.37
+0.5x    -9.57
+1x     -11.93
+1.5x   -14.04
+2x     -16.10
+3x     -20.09
+-- atraso
+t+1   -11.93
+t+2   -13.93
+t+3   -12.66
+t+4   -13.06
+t+6   -14.34
+-- Monte Carlo
+                          1 ano(s)  3 ano(s)  5 ano(s)
+P(bater o benchmark) %       27.78     13.30      7.34
+ativo a.a. p5 pp            -35.95    -25.44    -22.23
+ativo a.a. mediana pp        -9.49    -10.61    -10.82
+ativo a.a. p95 pp            18.47      5.23      1.40
+pior queda relativa p5 %    -42.03    -64.19    -75.17
+-- look-ahead (truncamento)
+           dias comparados maior diferença diária passou
+2017-03-02            1299                    0.0   True
+2020-11-13            2227                    0.0   True
+2024-07-26            3155                    0.0   True
+-- placebo {'excesso bruto OOS real pp': np.float64(7.142), 'placebo mediana pp': -0.6, 'placebo p95 pp': 6.434, 'p-valor (fração de placebos >= real)': 0.025}
+-- melhores negócios
+         ativo  lado    entrada      saida  dias  retorno_%  contrib_pp motivo
+     SIL x SLV     1 2020-03-02 2020-04-13    29       6.44        4.68  média
+     SIL x SLV    -1 2011-07-18 2011-08-08    15      17.51        3.03  média
+     SIL x SLV     1 2024-02-19 2024-04-01    29       9.31        3.02  média
+     SIL x SLV     1 2025-07-21 2025-08-11    15      12.55        2.98  média
+     SIL x SLV     1 2023-08-21 2023-09-18    19       6.05        2.94  média
+VALE x BHP/RIO     1 2025-06-02 2025-06-16    10       7.58        2.87  média
+     SIL x SLV     1 2024-06-17 2024-07-15    20       9.12        2.83  média
+VALE x BHP/RIO    -1 2015-01-19 2015-02-02    10      14.82        2.81  média
+-- piores negócios
+         ativo  lado    entrada      saida  dias  retorno_%  contrib_pp motivo
+     SIL x SLV     1 2025-10-13 2026-03-02    95     -22.13      -16.05  média
+     SIL x SLV    -1 2016-02-22 2016-08-11   120     -36.49      -15.76  prazo
+VALE x BHP/RIO     1 2018-12-17 2019-06-11   120     -21.06       -8.09  prazo
+VALE x BHP/RIO    -1 2025-09-15 2026-03-09   120     -11.55       -6.93  prazo
+     SIL x SLV     1 2011-01-17 2011-07-04   115     -28.55       -6.85  média
+VALE x BHP/RIO    -1 2020-10-13 2021-02-17    86     -17.01       -6.68  média
+VALE x BHP/RIO     1 2020-02-26 2020-06-01    65      -8.52       -6.61  média
+VALE x BHP/RIO     1 2024-03-18 2024-08-12   102     -11.01       -5.54  média
+-- quem trouxe o retorno
+                  sum  count
+ativo                       
+SIL x SLV       27.81    100
+VALE x BHP/RIO  11.70     95
+-- concentração
+sem os 1 melhores    -12.46
+sem os 3 melhores    -13.49
+sem os 5 melhores    -14.48
+sem os 10 melhores   -16.43
+sem os 1 piores       -9.15
+sem os 3 piores       -6.98
+sem os 5 piores       -5.66
+-- regime
+        ativo IS pp  ativo OOS pp  IR OOS  pior queda %
+nenhum         3.99        -11.93   -0.54        -42.55
+-- walk-forward: -11.93 pp
+-- tamanho do capital (ativo OOS antes do IR, pp)
+R$ 5.000        -1.51
+R$ 10.000       -1.35
+R$ 20.000      -11.93
+R$ 50.000      -10.47
+R$ 100.000     -10.19
+R$ 1.000.000    -9.98
+-- alavancagem (5x não é viável: Reg T limita o bruto (comprado + vendido) a 2x o patrimônio overnight e a 1x já usa ~1,1-1,7x de bruto (a ponta vendida consome margem); portfolio margin exige US$ 110 mil; micro futuros de metal (MGC 10 oz ~US$ 41 mil, micro prata 1.000 oz ~US$ 50 mil, MHG 2.500 lb ~US$ 12 mil de nocional) são 3-12x a conta inteira de US$ ~4 mil e 5-30x a perna de metal de um par, logo não cabem em contratos inteiros. 1,5x e 2x rodam, mas o teto de 2x de bruto corta (alavancagem efetiva ~1,1-1,3x da 1x).)
+     ativo OOS pp ativo total pp  vol OOS % pior queda total % quebrou
+1x     -11.934763      -2.426106  18.080418         -42.551148   False
+1.5x   -11.546118      -2.059232  20.177032         -45.348912   False
+2x     -13.711491      -4.382301   21.83114         -48.934535   False
+-- depois do IR (15% nos dois lados)
+   fundo líquido de IR a.a. %: -1.36
+   CDI líquido de IR a.a. %: 9.73
+   ativo líquido de IR pp: -11.08
+
+====================================================================================================
+>>> Rebalanceamento do Ibovespa (varejo B3) (R$ 20,000)
+aplicável: Aplicável: ações de mid caps em fracionário com corretagem zero; o hedge em WIN não cabe (1 contrato ~R$ 40 mil > exposição), então na prática com R$ 20 mil o fundo fica SEM hedge (risco de Ibovespa nos ~10 dias de posição)
+instrumentos: Clear/Rico/Inter (corretagem zero): ~4 entrantes do Ibovespa por revisão (jan/mai/set), 1/15 do capital cada (~R$ 1,3 mil com R$ 20 mil -> fracionário, ticker XXXX3F, 1 ação mínima), compra 10 pregões antes e venda no leilão de fechamento do último pregão da carteira velha; resto em Tesouro Selic/LFTS11. Hedge: WINxxx vendido (R$ 0,20 x pontos, margem ~R$ 6-10 mil/contrato) só quando a exposição >= meio contrato; alternativa BOVA11 vendido via aluguel (Rico/XP; garantia ~125%). Alavancagem: termo (XP/Rico).
+   base ok (3s)
+   grade ok (11s)
+   leque ok (72s)
+   truncamento ok (91s)
+   pronto (105s)
+                       total  dentro da amostra  fora da amostra
+retorno a.a. %         11.71              10.89            12.65
+benchmark a.a. %       10.08               8.89            11.44
+ativo a.a. pp           1.63               1.99             1.21
+vol a.a. %              2.70               3.08             2.19
+Sharpe                  0.56               0.61             0.51
+IR vs bench             0.56               0.61             0.51
+pior queda %           -3.43              -3.43            -1.49
+meses batendo bench %  16.78              16.46            17.14
+assimetria              3.24               3.44             2.05
+pior dia %             -2.15              -2.15            -1.23
+
+-- robustez: variantes: 6.0, PBO %: 5.6, % variantes que batem o benchmark OOS: 50.0, mediana das variantes OOS pp: 0.0, Sharpe deflacionado (grade) %: 66.6, Sharpe deflacionado (109 estratégias x grade) %: 23.3
+-- leque: p5 -0.1 | mediana +1.2 | p95 +1.5 | P(>0) 88%
+-- custo
+0x      1.65
+0.5x    1.43
+1x      1.21
+1.5x    1.00
+2x      0.79
+3x      0.37
+-- atraso
+t+1    1.21
+t+2    0.98
+t+3   -1.14
+t+4   -1.22
+t+6   -2.54
+-- Monte Carlo
+                          1 ano(s)  3 ano(s)  5 ano(s)
+P(bater o benchmark) %       71.62     84.90     90.48
+ativo a.a. p5 pp             -1.83     -0.62     -0.26
+ativo a.a. mediana pp         1.03      1.06      1.09
+ativo a.a. p95 pp             4.44      2.97      2.53
+pior queda relativa p5 %     -3.12     -4.84     -5.79
+-- look-ahead (truncamento)
+           dias comparados maior diferença diária passou
+2018-09-27            1087                    0.0   True
+2021-11-01            1863                    0.0   True
+2024-12-04            2640                    0.0   True
+-- placebo {'excesso bruto OOS real pp': np.float64(2.198), 'placebo mediana pp': -0.014, 'placebo p95 pp': 0.736, 'p-valor (fração de placebos >= real)': 0.005}
+-- melhores negócios
+ ativo  lado    entrada      saida  dias  contrib_pp
+ OIBR3     1 2019-08-19 2019-09-02    11        2.20
+ HEDGE    -1 2015-12-17 2016-01-04    11        1.86
+ IRBR3     1 2023-04-14 2023-05-02    11        1.72
+ AMER3     1 2022-08-18 2022-09-01    11        1.59
+ BEEF3     1 2020-04-16 2020-05-04    11        1.51
+BIDI11     1 2021-04-16 2021-05-03    11        1.22
+ GNDI3     1 2019-08-19 2019-09-02    11        1.13
+ NATU3     1 2026-08-18 2026-09-01    11        1.02
+-- piores negócios
+ativo  lado    entrada      saida  dias  contrib_pp
+TEND3     1 2026-04-16 2026-05-04    11       -1.00
+YDUQ3     1 2020-08-18 2020-09-01    11       -0.99
+CMIN3     1 2022-04-14 2022-05-02    11       -0.77
+POMO4     1 2024-12-17 2025-01-02    11       -0.73
+GOLL4     1 2018-08-20 2018-09-03    11       -0.67
+SOMA3     1 2022-04-14 2022-05-02    11       -0.65
+PETZ3     1 2021-12-20 2022-01-03    11       -0.61
+STBP3     1 2024-08-19 2024-09-02    11       -0.55
+-- quem trouxe o retorno
+         sum  count
+ativo              
+OIBR3   2.70      2
+HEDGE   2.38      2
+IRBR3   2.29      2
+AMER3   1.59      1
+BEEF3   1.51      1
+BIDI11  1.22      1
+GNDI3   1.13      1
+NATU3   1.02      1
+SANB11  1.01      2
+MGLU3   0.98      1
+-- concentração
+sem os 1 melhores     0.91
+sem os 3 melhores     0.43
+sem os 5 melhores     0.09
+sem os 10 melhores   -0.56
+sem os 1 piores       1.39
+sem os 3 piores       1.65
+sem os 5 piores       1.87
+-- regime
+        ativo IS pp  ativo OOS pp  IR OOS  pior queda %
+nenhum         1.99          1.21    0.51         -3.43
+-- walk-forward: +1.21 pp
+-- tamanho do capital (ativo OOS antes do IR, pp)
+R$ 5.000        0.95
+R$ 10.000       1.08
+R$ 20.000       1.21
+R$ 50.000       2.49
+R$ 100.000      1.29
+R$ 1.000.000    1.73
+-- alavancagem (Todas rodam: a posição média é só ~25% do capital; com 5x a garantia (termo 30% + WIN 25%) limita a exposição e a alavancagem efetiva fica abaixo de 5x. Termo em fracionário/mid cap depende da corretora aceitar (premissa).)
+     ativo OOS pp ativo total pp vol OOS % pior queda total % quebrou
+1x        1.21329       1.632958  2.190945          -3.430578   False
+1.5x      2.86863       1.723457  3.071475          -2.940619   False
+2x       5.699483       3.095231  4.230272          -3.740001   False
+5x       7.380572        5.56596  8.197958         -11.156139   False
+-- depois do IR (15% nos dois lados)
+   fundo líquido de IR a.a. %: 10.76
+   CDI líquido de IR a.a. %: 9.73
+   ativo líquido de IR pp: 1.03
+
+====================================================================================================
+>>> Eurobonds HY Brasil — substituto de varejo (ETF HYEM, câmbio sem hedge) (R$ 20,000)
+NÃO aplicável: Não aplicável: os eurobonds HY que o fundo compra têm lote mínimo de US$ 200 mil (15 bonds = US$ 3 mi) e corporativos BR na Avenue começam em US$ 50 mil; testado o substituto ETF HYEM na IBKR, sem hedge cambial (WDO de US$ 10 mil não cabe)
+instrumentos: IBKR (conta em US$; remessa com IOF 1,1% ida / 0,38% volta): HYEM (VanEck EM High Yield Bond ETF, ~US$ 19/cota, cota inteira, comissão US$ 0,005/cota mín. US$ 1); caixa em SGOV. Alternativa B3 sem remessa: BDR HYEM39 (Clear/Rico/XP, pouco líquido). Alavancagem: margem Reg T da IBKR (até 2x, conta >= US$ 2 mil).
+   base ok (0s)
+   grade ok (1s)
+   leque ok (3s)
+   truncamento ok (4s)
+   pronto (6s)
+                       total  dentro da amostra  fora da amostra
+retorno a.a. %          1.52              -5.02             9.05
+benchmark a.a. %       11.44               9.95            13.06
+ativo a.a. pp          -9.92             -14.97            -4.02
+vol a.a. %             13.28              14.90            11.26
+Sharpe                 -0.64              -0.91            -0.26
+IR vs bench            -0.64              -0.91            -0.26
+pior queda %          -32.50             -32.50           -12.32
+meses batendo bench %  47.14              38.89            55.88
+assimetria              0.15               0.33            -0.24
+pior dia %             -4.42              -3.28            -4.42
+
+-- robustez: variantes: 9.0, PBO %: 53.6, % variantes que batem o benchmark OOS: 0.0, mediana das variantes OOS pp: -8.1, Sharpe deflacionado (grade) %: 23.1, Sharpe deflacionado (109 estratégias x grade) %: 14.3
+-- leque: p5 -4.0 | mediana -4.0 | p95 -4.0 | P(>0) 0%
+-- custo
+0x     -3.45
+0.5x   -3.73
+1x     -4.02
+1.5x   -4.30
+2x     -4.58
+3x     -5.12
+-- atraso
+t+1   -4.02
+t+2   -4.02
+t+3   -4.02
+t+4   -4.02
+t+6   -4.02
+-- Monte Carlo
+                          1 ano(s)  3 ano(s)  5 ano(s)
+P(bater o benchmark) %       35.58     27.08     20.58
+ativo a.a. p5 pp            -17.81    -12.45    -10.42
+ativo a.a. mediana pp        -3.90     -3.72     -3.57
+ativo a.a. p95 pp            14.09      6.13      4.13
+pior queda relativa p5 %    -20.95    -37.18    -46.59
+-- look-ahead (truncamento)
+           dias comparados maior diferença diária passou
+2023-01-09             507                    0.0   True
+2024-06-24             870                    0.0   True
+2025-11-28            1233                    0.0   True
+-- placebo {'excesso bruto OOS real pp': np.float64(-3.062), 'placebo mediana pp': 0.0, 'placebo p95 pp': 7.241, 'p-valor (fração de placebos >= real)': 0.915}
+-- melhores negócios
+ativo  lado    entrada      saida  dias  retorno_%  contrib_pp
+ HYEM     1 2024-01-02 2024-12-31   253      29.37       25.67
+ HYEM     1 2021-01-04 2021-12-31   251       1.50        2.16
+ HYEM     1 2020-12-02 2020-12-31    21       0.40        0.41
+ HYEM     1 2023-01-02 2023-12-29   249     -11.07      -11.81
+ HYEM     1 2025-01-02 2025-12-31   252     -15.10      -16.63
+ HYEM     1 2026-01-02 2026-10-13   195     -15.65      -16.91
+ HYEM     1 2022-01-03 2022-12-30   251     -27.96      -30.23
+-- piores negócios
+ativo  lado    entrada      saida  dias  retorno_%  contrib_pp
+ HYEM     1 2022-01-03 2022-12-30   251     -27.96      -30.23
+ HYEM     1 2026-01-02 2026-10-13   195     -15.65      -16.91
+ HYEM     1 2025-01-02 2025-12-31   252     -15.10      -16.63
+ HYEM     1 2023-01-02 2023-12-29   249     -11.07      -11.81
+ HYEM     1 2020-12-02 2020-12-31    21       0.40        0.41
+ HYEM     1 2021-01-04 2021-12-31   251       1.50        2.16
+ HYEM     1 2024-01-02 2024-12-31   253      29.37       25.67
+-- quem trouxe o retorno
+         sum  count
+ativo              
+HYEM  -47.34      7
+-- concentração
+sem os 1 melhores    -13.26
+sem os 3 melhores     -1.18
+sem os 5 melhores     -1.18
+sem os 10 melhores    -1.18
+sem os 1 piores        2.07
+sem os 3 piores       -1.18
+sem os 5 piores       -1.18
+-- regime
+        ativo IS pp  ativo OOS pp  IR OOS  pior queda %
+nenhum       -14.97         -4.02   -0.26         -32.5
+-- walk-forward: -8.87 pp
+-- tamanho do capital (ativo OOS antes do IR, pp)
+R$ 5.000       -4.28
+R$ 10.000      -4.08
+R$ 20.000      -4.02
+R$ 50.000      -3.96
+R$ 100.000     -3.95
+R$ 1.000.000   -3.94
+-- alavancagem (5x não é viável: não existe futuro de crédito HY emergente para pessoa física e a margem Reg T da IBKR vai no máximo a 2x (portfolio margin só acima de US$ 110 mil); com R$ 4 mil (< US$ 2 mil) não há conta margem e tudo vira 1x; BDR não alavanca.)
+     ativo OOS pp ativo total pp  vol OOS % pior queda total % quebrou
+1x      -4.015899      -9.916953  11.262576         -32.497203   False
+1.5x    -2.627801     -11.140008  12.276048          -42.28431   False
+2x       -1.41277     -12.798377  13.732521         -51.366634   False
+-- depois do IR (15% nos dois lados)
+   fundo líquido de IR a.a. %: 8.24
+   CDI líquido de IR a.a. %: 11.10
+   ativo líquido de IR pp: -2.85
+-- carteira com alavancagem
+                                                                   alavancagem por fundo OOS a.a. % ativo OOS pp     vol % pior queda total % ativo líquido de IR pp quebrou
+1.5x  {'variancia_varejo': 1.5, 'mineradoras_varejo': 1.5, 'rebal_ibovespa_varejo': 1.5}  11.132443     -0.30881  2.911655           -4.95735              -0.263171   False
+2x          {'variancia_varejo': 2, 'mineradoras_varejo': 2, 'rebal_ibovespa_varejo': 2}  11.110369    -0.330884  3.836493          -8.155408              -0.281442   False
+5x          {'variancia_varejo': 5, 'mineradoras_varejo': 2, 'rebal_ibovespa_varejo': 5}   14.72344     3.282187  7.144776         -11.060946               2.814082   False
+
+====================================================================================================
+CARTEIRA DE R$ 20 MIL (sem alavancagem extra)
+R$ por fundo:
+variancia_varejo          6653.0
+mineradoras_varejo        1977.0
+rebal_ibovespa_varejo    11370.0
+                       total  fora da amostra
+retorno a.a. %         10.23            11.05
+benchmark a.a. %       10.07            11.44
+ativo a.a. pp           0.16            -0.39
+vol a.a. %              2.09             1.95
+Sharpe                  0.08            -0.17
+IR vs bench             0.08            -0.17
+pior queda %           -2.90            -0.75
+meses batendo bench %  47.79            48.57
+assimetria              0.82             0.42
+pior dia %             -1.19            -0.70
+-- depois do IR
+   fundo líquido de IR a.a. %: 9.39
+   CDI líquido de IR a.a. %: 9.73
+   ativo líquido de IR pp: -0.33
+-- sem cada fundo
+sem Variância do S&P vendida (beta neutro) — varejo    0.60
+sem Mineradoras vs metal (varejo IBKR/B3)             -0.21
+sem Rebalanceamento do Ibovespa (varejo B3)           -2.37
+-- Monte Carlo
+                          1 ano(s)  3 ano(s)  5 ano(s)
+P(bater o benchmark) %       41.74     36.00     32.72
+ativo a.a. p5 pp             -3.14     -2.00     -1.62
+ativo a.a. mediana pp        -0.37     -0.35     -0.36
+ativo a.a. p95 pp             2.50      1.30      0.88
+pior queda relativa p5 %     -3.98     -7.16     -9.41
+-- correlação OOS
+                                                 Variância do S&P vendida (beta neutro) — varejo  Mineradoras vs metal (varejo IBKR/B3)  Rebalanceamento do Ibovespa (varejo B3)
+Variância do S&P vendida (beta neutro) — varejo                                             1.00                                  -0.15                                    -0.08
+Mineradoras vs metal (varejo IBKR/B3)                                                      -0.15                                   1.00                                     0.04
+Rebalanceamento do Ibovespa (varejo B3)                                                    -0.08                                   0.04                                     1.00
+
+Arquivos em C:\Users\maxpn\OneDrive\Documents\itau\quant\fundos-quant-top5\varejo\resultados

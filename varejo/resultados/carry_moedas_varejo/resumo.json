@@ -1,0 +1,19 @@
+{
+ "variantes": 4.0,
+ "PBO %": 50.39682539682539,
+ "% variantes que batem o benchmark OOS": 0.0,
+ "mediana das variantes OOS pp": -5.5431932788085,
+ "Sharpe deflacionado (grade) %": 7.1183301093012865,
+ "Sharpe deflacionado (109 estratégias x grade) %": 5.125923280675161,
+ "excesso bruto OOS real pp": 11.168099380092466,
+ "placebo mediana pp": 10.985194710201318,
+ "placebo p95 pp": 17.263599974188686,
+ "p-valor (fração de placebos >= real)": 0.49,
+ "fundo líquido de IR a.a. %": 4.478512474893304,
+ "CDI líquido de IR a.a. %": 9.727706429189142,
+ "ativo líquido de IR pp": -5.249193954295839,
+ "walk-forward ativo OOS pp": -5.201509870558274,
+ "aplicavel": false,
+ "motivo": "Com R$ 20 mil o carry não sobrevive: micro futuros (US$ 6,5–15 mil/contrato) e WDO (US$ 10 mil) não cabem nas pernas de ~US$ 1 mil (zero contratos = CDI); FX à vista inverte o carry (conta < US$ 10 mil não recebe juros e paga BM+1,5% no vendido); ETFs montam o livro mas exigem ~77% do capital em dólar sem hedge, que custa ~8 pp a.a. de CDI - T-bill.",
+ "instrumentos": "Via ETF (padrão): IBKR Pro — compra/venda FXE, FXB, FXA, FXC, FXF, FXY (CurrencyShares, 0,40%) e CEW (cesta EM via forwards, 0,55%) no lugar das pernas emergentes; venda a descoberto só em conta margem (mín. US$ 2.000), ações inteiras, aluguel ~0,5% (CEW 2%), Reg T 50% inicial / 25–30% manutenção; abaixo de US$ 2 mil só as pernas compradas (conta caixa). Perna BRL: vender WDO na B3 (US$ 10 mil, garantia em Tesouro Selic) — nunca cabe em R$ 20 mil. Alternativas testadas: via='micro' (M6E 12.500 EUR, M6B 6.250 GBP, M6A 10.000 AUD, MCD 10.000 CAD, MSF 12.500 CHF, MJY 1,25 mi JPY; margem US$ 150–400) e via='spot' (IBKR FX)."
+}

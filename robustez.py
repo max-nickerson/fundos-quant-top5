@@ -105,11 +105,11 @@ def grade(m, d):
                         "IR IS": {k: ir(ins(m, A[k])) for k in A}, "IR OOS": {k: ir(oos(m, A[k])) for k in A}}).sort_values("ativo OOS pp")
     var_sr = (ins(m, A).mean() / ins(m, A).std()).var()
     escolhido = ativo(m, cota(m, m.excesso(d)))
-    resumo = {"variantes": len(A), "PBO %": pbo(A),
+    resumo = {"variantes": A.shape[1], "PBO %": pbo(A),
               "% variantes que batem o benchmark OOS": (res["ativo OOS pp"] > 0).mean() * 100,
               "mediana das variantes OOS pp": res["ativo OOS pp"].median(),
-              "Sharpe deflacionado (grade) %": sharpe_deflacionado(oos(m, escolhido), len(A), var_sr),
-              f"Sharpe deflacionado ({N_TOTAL_TESTES} estratégias x grade) %": sharpe_deflacionado(oos(m, escolhido), N_TOTAL_TESTES * len(A), var_sr)}
+              "Sharpe deflacionado (grade) %": sharpe_deflacionado(oos(m, escolhido), A.shape[1], var_sr),
+              f"Sharpe deflacionado ({N_TOTAL_TESTES} estratégias x grade) %": sharpe_deflacionado(oos(m, escolhido), N_TOTAL_TESTES * A.shape[1], var_sr)}
     return res, curvas, resumo
 
 

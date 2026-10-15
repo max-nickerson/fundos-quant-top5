@@ -1,0 +1,4 @@
+,alavancagem por fundo,OOS a.a. %,ativo OOS pp,vol %,pior queda total %,ativo líquido de IR pp,quebrou
+1.5x,"{'variancia_varejo': 1.5, 'mineradoras_varejo': 1.5, 'rebal_ibovespa_varejo': 1.5}",11.132442776975449,-0.30881044671304814,2.9116545544642323,-4.957350233446167,-0.2631712540068776,False
+2x,"{'variancia_varejo': 2, 'mineradoras_varejo': 2, 'rebal_ibovespa_varejo': 2}",11.110369169470413,-0.33088405421808353,3.836493094078812,-8.155408467943982,-0.28144167669263886,False
+5x,"{'variancia_varejo': 5, 'mineradoras_varejo': 2, 'rebal_ibovespa_varejo': 5}",14.723439793372407,3.28218656968391,7.144775638876967,-11.060945979072667,2.814081976532213,False

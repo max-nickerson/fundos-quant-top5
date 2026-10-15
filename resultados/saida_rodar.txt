@@ -25,12 +25,12 @@ assimetria             -4.98              -6.08            -2.43
 pior dia %             -6.79              -6.79            -2.75
 
 -- grade original / PBO / Sharpe deflacionado
-   variantes: 4718.0
+   variantes: 4.0
    PBO %: 0.0
    % variantes que batem o benchmark OOS: 100.0
    mediana das variantes OOS pp: 4.2
-   Sharpe deflacionado (grade) %: 51.0
-   Sharpe deflacionado (109 estratégias x grade) %: 19.9
+   Sharpe deflacionado (grade) %: 98.5
+   Sharpe deflacionado (109 estratégias x grade) %: 71.4
 
 -- leque de parâmetros (60 sorteios): ativo OOS p5 +1.8 | mediana +4.5 | p95 +9.6 pp | P(>0) 100%
 
@@ -124,9 +124,9 @@ nenhum               2.98          7.90    0.85        -20.53
 >>> Carry de moedas G10 + emergentes: carregando dados e rodando a bateria de robustez
    base ok (0s)
    grade ok (1s)
-   leque ok (7s)
-   truncamento ok (9s)
-   pronto (12s)
+   leque ok (9s)
+   truncamento ok (11s)
+   pronto (14s)
 
 ====================================================================================================
 Carry de moedas G10 + emergentes
@@ -135,34 +135,34 @@ benchmark CDI | fora da amostra desde 2021-01-01 | parâmetros {'n': 3, 'try_hc'
 
 -- métricas
                        total  dentro da amostra  fora da amostra
-retorno a.a. %         13.17              10.49            18.45
+retorno a.a. %         12.35               9.27            18.45
 benchmark a.a. %        9.94               9.16            11.44
-ativo a.a. pp           3.23               1.33             7.01
-vol a.a. %              6.27               6.31             6.17
-Sharpe                  0.49               0.22             1.02
-IR vs bench             0.49               0.22             1.02
-pior queda %           -9.93              -8.45            -9.93
-meses batendo bench %  57.92              54.55            64.29
-assimetria             -0.87              -1.06            -0.47
+ativo a.a. pp           2.41               0.11             7.01
+vol a.a. %              6.30               6.35             6.17
+Sharpe                  0.38               0.05             1.02
+IR vs bench             0.38               0.05             1.02
+pior queda %           -9.92              -8.64            -9.92
+meses batendo bench %  56.93              52.27            65.71
+assimetria             -1.00              -1.25            -0.47
 pior dia %             -4.94              -4.94            -2.16
 
 -- grade original / PBO / Sharpe deflacionado
-   variantes: 4214.0
-   PBO %: 6.3
+   variantes: 4.0
+   PBO %: 12.3
    % variantes que batem o benchmark OOS: 100.0
    mediana das variantes OOS pp: 6.7
-   Sharpe deflacionado (grade) %: 71.3
-   Sharpe deflacionado (109 estratégias x grade) %: 50.9
+   Sharpe deflacionado (grade) %: 98.1
+   Sharpe deflacionado (109 estratégias x grade) %: 92.5
 
--- leque de parâmetros (60 sorteios): ativo OOS p5 +2.4 | mediana +6.3 | p95 +9.4 pp | P(>0) 100%
+-- leque de parâmetros (60 sorteios): ativo OOS p5 +2.4 | mediana +6.4 | p95 +9.3 pp | P(>0) 100%
 
 -- custo (ativo OOS pp)
-0x      7.38
-0.5x    7.12
+0x      7.47
+0.5x    7.24
 1x      7.01
 1.5x    6.78
-2x      6.56
-3x      6.42
+2x      6.88
+3x      6.43
 -- atraso de execução (ativo OOS pp)
 t+1    7.01
 t+2    7.02
@@ -172,11 +172,11 @@ t+6    7.48
 
 -- Monte Carlo (excesso sobre o benchmark, bootstrap em blocos do fora da amostra)
                           1 ano(s)  3 ano(s)  5 ano(s)
-P(bater o benchmark) %       80.78     92.08     96.76
-ativo a.a. p5 pp             -6.09     -1.10      0.60
-ativo a.a. mediana pp         6.90      6.50      6.36
-ativo a.a. p95 pp            18.77     13.56     12.00
-pior queda relativa p5 %    -12.00    -17.04    -19.17
+P(bater o benchmark) %       80.84     92.04     96.74
+ativo a.a. p5 pp             -6.08     -1.08      0.59
+ativo a.a. mediana pp         6.92      6.50      6.35
+ativo a.a. p95 pp            18.78     13.55     11.99
+pior queda relativa p5 %    -12.00    -17.04    -19.14
 
 -- look-ahead: truncamento
            dias comparados maior diferença diária passou
@@ -192,32 +192,31 @@ pior queda relativa p5 %    -12.00    -17.04    -19.17
 -- 10 melhores negócios
 ativo  lado    entrada      saida  dias  retorno_%  contrib_pp
 JPY=X    -1 2016-10-03 2026-10-14  2522      82.82       14.52
-TRY=X    -1 2008-02-01 2014-10-01  1678      73.28       14.52
 MXN=X     1 2016-10-03 2026-04-01  2386      71.02       10.85
 BRL=X     1 2021-05-03 2026-10-14  1370      62.24       10.68
 SEK=X    -1 2014-11-03 2020-04-01  1361      39.15        8.73
 COP=X     1 2025-06-02 2026-10-14   345      35.70        7.21
-ILS=X    -1 2014-08-01 2015-03-02   145      15.98        3.69
+ILS=X    -1 2014-08-01 2015-03-02   145      15.98        3.55
 CHF=X    -1 2011-09-01 2014-10-01   774      16.72        2.79
 CHF=X    -1 2008-08-01 2008-11-03    65      11.25        2.72
+TRY=X    -1 2008-02-01 2014-10-01  1678      73.28        2.65
 HUF=X     1 2022-07-01 2024-03-01   418      17.48        2.64
 -- 10 piores negócios
 ativo  lado    entrada      saida  dias  retorno_%  contrib_pp
 CHF=X    -1 2007-04-02 2008-04-01   251     -16.59       -4.44
-CZK=X    -1 2010-08-02 2011-09-01   275     -11.50       -2.83
-ILS=X    -1 2009-03-02 2009-09-01   128     -10.09       -2.53
-CZK=X    -1 2020-06-01 2021-09-01   317     -11.45       -2.52
+CZK=X    -1 2010-08-02 2011-09-01   275     -11.50       -3.10
+CZK=X    -1 2020-06-01 2021-09-01   317     -11.45       -2.82
+ILS=X    -1 2009-03-02 2009-09-01   128     -10.09       -2.65
 JPY=X    -1 2015-03-02 2016-04-01   274      -6.76       -1.79
 ZAR=X     1 2007-04-02 2022-01-03  3716      -3.14       -1.73
 COP=X     1 2024-03-01 2024-12-02   190      -7.20       -1.44
-CZK=X    -1 2008-02-01 2008-03-03    20      -6.26       -1.35
-CZK=X    -1 2012-07-02 2012-12-03   105      -4.74       -1.19
+CZK=X    -1 2008-02-01 2008-03-03    20      -6.26       -1.37
+CZK=X    -1 2012-07-02 2012-12-03   105      -4.74       -1.27
 CAD=X    -1 2009-09-01 2010-07-01   209      -5.12       -1.16
 
 -- quem trouxe o retorno (soma por ativo, pp)
             sum  count
 ativo                 
-TRY=X     14.52      1
 JPY=X     13.12      3
 BRL=X     11.04      2
 MXN=X     10.85      1
@@ -225,38 +224,39 @@ SEK=X      8.17     10
 COP=X      6.95      3
 EURUSD=X   4.21      7
 HUF=X      2.69      3
-THB=X      1.67      4
+TRY=X      2.65      1
+THB=X      1.77      4
 INR=X      0.65      3
-ILS=X      0.64      3
 NOK=X      0.49      1
+CHF=X      0.38      5
 
 -- concentração (ativo OOS sem os maiores negócios, pp)
 sem os 1 melhores     5.16
-sem os 3 melhores     3.45
+sem os 3 melhores     3.44
 sem os 5 melhores     2.77
 sem os 10 melhores    2.11
 sem os 1 piores       7.26
-sem os 3 piores       7.53
-sem os 5 piores       7.73
+sem os 3 piores       7.52
+sem os 5 piores       7.72
 -- variação do excesso bruto OOS ao tirar cada ativo (pp)
-TRY=X       0.00
 JPY=X      -2.47
+CZK=X       0.25
 BRL=X      -2.16
 MXN=X      -1.55
-CZK=X       0.25
 SEK=X      -0.27
 COP=X      -1.14
 EURUSD=X   -0.72
+HUF=X      -0.33
 
 -- regime ligado x desligado
          ativo IS pp  ativo OOS pp  IR OOS  pior queda %
-dd_stop         1.33          7.01    1.02         -9.93
-nenhum          1.18          8.88    1.19        -16.04
+dd_stop         0.11          7.01    1.02         -9.92
+nenhum          0.34          8.88    1.19        -16.09
 
--- walk-forward (re-escolhe a variante todo ano só com o passado): ativo OOS +8.83 pp a.a.
+-- walk-forward (re-escolhe a variante todo ano só com o passado): ativo OOS +10.12 pp a.a.
 2021    {'n': 3, 'try_hc': 0.0}
-2022    {'n': 3, 'try_hc': 0.0}
-2023    {'n': 3, 'try_hc': 0.0}
+2022    {'n': 4, 'try_hc': 0.0}
+2023    {'n': 4, 'try_hc': 0.0}
 2024    {'n': 4, 'try_hc': 0.0}
 2025    {'n': 4, 'try_hc': 0.0}
 2026    {'n': 4, 'try_hc': 0.0}
@@ -264,9 +264,9 @@ nenhum          1.18          8.88    1.19        -16.04
 >>> Mineradoras vs metal: carregando dados e rodando a bateria de robustez
    base ok (1s)
    grade ok (5s)
-   leque ok (50s)
-   truncamento ok (62s)
-   pronto (66s)
+   leque ok (49s)
+   truncamento ok (60s)
+   pronto (65s)
 
 ====================================================================================================
 Mineradoras vs metal
@@ -287,12 +287,12 @@ assimetria              0.11              -0.13             0.64
 pior dia %             -4.72              -4.72            -2.60
 
 -- grade original / PBO / Sharpe deflacionado
-   variantes: 3712.0
+   variantes: 4.0
    PBO %: 25.0
    % variantes que batem o benchmark OOS: 100.0
    mediana das variantes OOS pp: 5.0
-   Sharpe deflacionado (grade) %: 96.9
-   Sharpe deflacionado (109 estratégias x grade) %: 95.4
+   Sharpe deflacionado (grade) %: 98.9
+   Sharpe deflacionado (109 estratégias x grade) %: 97.5
 
 -- leque de parâmetros (60 sorteios): ativo OOS p5 +5.3 | mediana +8.6 | p95 +12.3 pp | P(>0) 100%
 
@@ -396,7 +396,7 @@ nenhum         4.84         11.66    1.01        -15.19
    base ok (2s)
    grade ok (4s)
    leque ok (15s)
-   truncamento ok (21s)
+   truncamento ok (22s)
    pronto (35s)
 
 ====================================================================================================
@@ -418,12 +418,12 @@ assimetria              3.77               3.34             4.58
 pior dia %             -1.72              -1.72            -0.77
 
 -- grade original / PBO / Sharpe deflacionado
-   variantes: 3106.0
+   variantes: 6.0
    PBO %: 25.8
    % variantes que batem o benchmark OOS: 100.0
    mediana das variantes OOS pp: 1.2
-   Sharpe deflacionado (grade) %: 90.1
-   Sharpe deflacionado (109 estratégias x grade) %: 81.0
+   Sharpe deflacionado (grade) %: 98.4
+   Sharpe deflacionado (109 estratégias x grade) %: 92.7
 
 -- leque de parâmetros (60 sorteios): ativo OOS p5 +0.3 | mediana +1.7 | p95 +1.9 pp | P(>0) 100%
 
@@ -534,9 +534,9 @@ nenhum         0.75          1.79    0.97         -2.61
 >>> Eurobonds high yield Brasil com hedge: carregando dados e rodando a bateria de robustez
    base ok (4s)
    grade ok (18s)
-   leque ok (232s)
-   truncamento ok (282s)
-   pronto (305s)
+   leque ok (233s)
+   truncamento ok (283s)
+   pronto (307s)
 
 ====================================================================================================
 Eurobonds high yield Brasil com hedge
@@ -557,12 +557,12 @@ assimetria             -0.32              -0.65            -0.06
 pior dia %             -2.63              -2.63            -1.99
 
 -- grade original / PBO / Sharpe deflacionado
-   variantes: 1451.0
+   variantes: 3.0
    PBO %: nan
    % variantes que batem o benchmark OOS: 100.0
    mediana das variantes OOS pp: 3.6
-   Sharpe deflacionado (grade) %: 74.4
-   Sharpe deflacionado (109 estratégias x grade) %: 73.5
+   Sharpe deflacionado (grade) %: 76.2
+   Sharpe deflacionado (109 estratégias x grade) %: 74.7
 
 -- leque de parâmetros (60 sorteios): ativo OOS p5 +2.2 | mediana +3.0 | p95 +4.9 pp | P(>0) 100%
 
@@ -679,26 +679,26 @@ ibov_tendencia  2024-08-05    0.0
 dd_stop         1500 dias     0.0
 
 ====================================================================================================
-CARTEIRA DOS 5 (alavancagem 3.35x)
+CARTEIRA DOS 5 (alavancagem 3.33x)
 pesos (fração do PL):
 variancia         0.67
-carry_moedas      0.51
+carry_moedas      0.50
 mineradoras       0.28
-rebal_ibovespa    1.44
+rebal_ibovespa    1.43
 eurobonds         0.45
 
 -- métricas
                        total  dentro da amostra  fora da amostra
-retorno a.a. %         18.04              17.17            23.22
+retorno a.a. %         17.61              16.67            23.18
 benchmark a.a. %       10.07               9.55            13.06
-ativo a.a. pp           7.98               7.61            10.15
-vol a.a. %              6.16               6.00             6.96
-Sharpe                  1.17               1.15             1.27
-IR vs bench             1.17               1.15             1.27
-pior queda %           -8.67              -8.67            -6.07
-meses batendo bench %  70.35              70.31            70.59
-assimetria             -0.92              -1.01            -0.58
-pior dia %             -4.59              -4.59            -2.91
+ativo a.a. pp           7.55               7.12            10.11
+vol a.a. %              6.15               6.00             6.92
+Sharpe                  1.11               1.08             1.27
+IR vs bench             1.11               1.08             1.27
+pior queda %           -9.34              -9.34            -6.02
+meses batendo bench %  69.03              68.75            70.59
+assimetria             -1.02              -1.14            -0.58
+pior dia %             -4.56              -4.56            -2.89
 
 -- correlação OOS
                                         Variância do S&P vendida (beta neutro)  Carry de moedas G10 + emergentes  Mineradoras vs metal  Rebalanceamento do Ibovespa  Eurobonds high yield Brasil com hedge
@@ -709,19 +709,19 @@ Rebalanceamento do Ibovespa                                              -0.01  
 Eurobonds high yield Brasil com hedge                                     0.05                              0.03                  0.11                         0.10                                   1.00
 
 -- sem cada fundo (ativo OOS pp)
-sem Variância do S&P vendida (beta neutro)     8.17
+sem Variância do S&P vendida (beta neutro)     8.14
 sem Carry de moedas G10 + emergentes           9.09
-sem Mineradoras vs metal                       8.28
-sem Rebalanceamento do Ibovespa               11.19
-sem Eurobonds high yield Brasil com hedge      8.64
+sem Mineradoras vs metal                       8.26
+sem Rebalanceamento do Ibovespa               11.17
+sem Eurobonds high yield Brasil com hedge      8.60
 
 -- Monte Carlo
                           1 ano(s)  3 ano(s)  5 ano(s)
-P(bater o benchmark) %       89.50     98.42     99.72
-ativo a.a. p5 pp             -2.68      2.21      3.54
-ativo a.a. mediana pp         9.08      9.15      9.00
-ativo a.a. p95 pp            21.03     16.20     14.41
-pior queda relativa p5 %     -9.52    -12.85    -14.29
--- pesos sorteados (200x): ativo OOS p5 +7.6 | mediana +9.3 | p95 +10.8 pp
+P(bater o benchmark) %       89.56     98.46     99.74
+ativo a.a. p5 pp             -2.64      2.24      3.54
+ativo a.a. mediana pp         9.05      9.11      8.96
+ativo a.a. p95 pp            20.90     16.12     14.32
+pior queda relativa p5 %     -9.45    -12.74    -14.18
+-- pesos sorteados (200x): ativo OOS p5 +7.5 | mediana +9.3 | p95 +10.8 pp
 
 Arquivos em C:\Users\maxpn\OneDrive\Documents\itau\quant\fundos-quant-top5\resultados

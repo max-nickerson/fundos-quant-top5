@@ -1,0 +1,19 @@
+{
+ "variantes": 12.0,
+ "PBO %": 67.06349206349206,
+ "% variantes que batem o benchmark OOS": 0.0,
+ "mediana das variantes OOS pp": -12.504156862879912,
+ "Sharpe deflacionado (grade) %": 6.377865957847358,
+ "Sharpe deflacionado (109 estratégias x grade) %": 3.700454759699883,
+ "excesso bruto OOS real pp": 7.142351628224363,
+ "placebo mediana pp": -0.5999536786912669,
+ "placebo p95 pp": 6.434107058420098,
+ "p-valor (fração de placebos >= real)": 0.025,
+ "fundo líquido de IR a.a. %": -1.3567632708071153,
+ "CDI líquido de IR a.a. %": 9.727706429189142,
+ "ativo líquido de IR pp": -11.084469699996259,
+ "walk-forward ativo OOS pp": -11.93476329545935,
+ "aplicavel": true,
+ "motivo": "Operável: com R$ 20 mil (~US$ 4 mil) a IBKR deixa vender a descoberto (Reg T >= US$ 2 mil) e os pares cabem em ações inteiras; com R$ 4 mil (< US$ 2 mil) só a B3 (2 pares, um sentido cada). Mas não paga: comissão mínima, venda sem juros e câmbio sem hedge levam o excesso OOS para negativo.",
+ "instrumentos": "IBKR Pro (EUA): pares GDX/GLD, GDXJ/GDX, SIL/SLV, COPX/CPER, FCX/CPER, VALE/(BHP+RIO); compra fracionária, venda a descoberto em ações inteiras (1 ação: GLD ~US$ 380, SLV ~US$ 50, CPER ~US$ 40, GDX ~US$ 85, RIO ~US$ 91); conta margem >= US$ 2 mil; margem Reg T 50% inicial, 25%/30% manutenção; caixa em SGOV. B3 (Clear/Rico/XP, conta pequena): GDXB39 comprado x GOLD11 vendido (BTC) e VALE3 vendido (BTC) x RIOT34 comprado, garantia em Tesouro Selic."
+}

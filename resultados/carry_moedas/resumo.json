@@ -1,13 +1,13 @@
 {
- "variantes": 4214.0,
- "PBO %": 6.349206349206349,
+ "variantes": 4.0,
+ "PBO %": 12.3015873015873,
  "% variantes que batem o benchmark OOS": 100.0,
- "mediana das variantes OOS pp": 6.734905536788094,
- "Sharpe deflacionado (grade) %": 71.34699884748667,
- "Sharpe deflacionado (109 estratégias x grade) %": 50.93286768903622,
+ "mediana das variantes OOS pp": 6.743499198816826,
+ "Sharpe deflacionado (grade) %": 98.06692403251354,
+ "Sharpe deflacionado (109 estratégias x grade) %": 92.46496570243579,
  "excesso bruto OOS real pp": 9.06882917524272,
  "placebo mediana pp": 8.913197701857301,
  "placebo p95 pp": 14.836919019386144,
  "p-valor (fração de placebos >= real)": 0.495,
- "walk-forward ativo OOS pp": 8.83276654771039
+ "walk-forward ativo OOS pp": 10.122135618986517
 }

@@ -1,16 +1,16 @@
 ,0
-sem os 1 melhores,5.1581
-sem os 3 melhores,3.4459
-sem os 5 melhores,2.7739
-sem os 10 melhores,2.113
-sem os 1 piores,7.2626
-sem os 3 piores,7.5253
-sem os 5 piores,7.7252
-TRY=X,0.0
+sem os 1 melhores,5.1568
+sem os 3 melhores,3.4447
+sem os 5 melhores,2.7726
+sem os 10 melhores,2.1112
+sem os 1 piores,7.2614
+sem os 3 piores,7.5241
+sem os 5 piores,7.724
 JPY=X,-2.4723
+CZK=X,0.2515
 BRL=X,-2.1573
 MXN=X,-1.554
-CZK=X,0.2515
 SEK=X,-0.2735
 COP=X,-1.1425
 EURUSD=X,-0.7188
+HUF=X,-0.3299

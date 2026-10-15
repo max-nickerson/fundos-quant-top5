@@ -1,0 +1,19 @@
+{
+ "variantes": 12.0,
+ "PBO %": 29.365079365079367,
+ "% variantes que batem o benchmark OOS": 0.0,
+ "mediana das variantes OOS pp": -9.53015851037814,
+ "Sharpe deflacionado (grade) %": 6.617178666267627,
+ "Sharpe deflacionado (109 estratégias x grade) %": 2.030294024291144,
+ "excesso bruto OOS real pp": 0.97656827539363,
+ "placebo mediana pp": 0.4325705428631199,
+ "placebo p95 pp": 1.6714240720020095,
+ "p-valor (fração de placebos >= real)": 0.2,
+ "fundo líquido de IR a.a. %": 7.977144023938276,
+ "CDI líquido de IR a.a. %": 9.727706429189142,
+ "ativo líquido de IR pp": -1.7505624052508661,
+ "walk-forward ativo OOS pp": -2.628974605436097,
+ "aplicavel": true,
+ "motivo": "swap de variância não é de varejo; o substituto operável com R$ 20 mil é SVXY + SH na IBKR (frações de ação), mas o prêmio do futuro de VIX é bem menor que o do swap e o dólar sem hedge pesa",
+ "instrumentos": "IBKR (conta cash ou margem; ações fracionárias): COMPRAR SVXY (ProShares −0,5x futuros de VIX; ~US$ 64) com ~10-25% do capital e SH (−1x S&P; ~US$ 32) no valor beta x SVXY; caixa lá fora em SGOV. Remeter só ~30% do capital; o resto em Tesouro Selic. Rebalancear só se a posição se afastar >50% do alvo; comissão IBKR Pro tiered. Alternativas testadas: VXM (Cboe, US$ 100 x VIX, margem ~US$ 750-860 por contrato -> 1 contrato ≈ 45% de R$ 20 mil, grande demais), opções XSP (1 iron butterfly ≈ US$ 1,8 mil de risco; 1 iron condor ≈ US$ 6 mil; 1 put ATM ≈ US$ 13 mil de margem)."
+}

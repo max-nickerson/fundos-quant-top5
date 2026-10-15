@@ -92,13 +92,30 @@ def carry(d, try_hc=0.0):
     return pd.DataFrame(out).reindex(DIAS_US)
 
 
+def carry_vendido(d):
+    """Carry que quem está VENDIDO na moeda paga: o diferencial cheio, sem desconto, mais o spread de financiamento em EM/NDF/TRY.
+    (O desconto de carry vale para quem RECEBE; quem paga não ganha desconto — corrigido após a auditoria de varejo.)"""
+    i = d["bis"].reindex(DIAS_US).ffill()
+    out = {}
+    for k, (pais, tipo) in MOEDAS.items():
+        dif = (i[pais] - i["US"]) / 100
+        if tipo in ("EM", "NDF", "TRY"):
+            dif = dif + .005
+        elif tipo == "BRL":
+            b = carry_brl(d)
+            dif = b.reindex(DIAS_US.union(b.index)).ffill().reindex(DIAS_US).combine_first(dif)
+        out[k] = dif
+    return pd.DataFrame(out).reindex(DIAS_US)
+
+
 # ---------------------------------------------------------------- livro
 def _livro(d, n=3, try_hc=0.0):
     """Pesos-alvo W (decididos em t), retorno em excesso R = spot + carry, e as duas partes separadas."""
     spot = d["fx"].reindex(DIAS_US).ffill(limit=5).pct_change(fill_method=None)[list(MOEDAS)]
     dif = carry(d, try_hc)
     car = dif.shift(1) / 252
-    R = (spot + car).dropna(how="all")
+    R = (spot + car).dropna(how="all")                          # comprado: recebe o carry com desconto
+    R_vend = (spot + carry_vendido(d).shift(1) / 252).reindex(R.index)   # vendido: paga o carry cheio + spread
     # ranking pelo carry: +1 nas n maiores, -1 nas n menores
     rk = dif.rank(axis=1, ascending=False)
     W = (rk <= n).astype(float) - ((rk > dif.notna().sum(axis=1).values[:, None] - n) & dif.notna()).astype(float)
@@ -106,35 +123,37 @@ def _livro(d, n=3, try_hc=0.0):
     vol = spot.rolling(63, min_periods=40).std()
     W = (W / vol).div((W / vol).abs().sum(axis=1).replace(0, np.nan), axis=0).fillna(0)
     W = mensal(vol_alvo(W, R.fillna(0), ALVO)).clip(-TETO, TETO)
-    return W, R, spot, car
+    return W, R, spot, car, R_vend
 
 
-def _executa(W, R, custo_mult=1, lag=0):
+def _executa(W, R, custo_mult=1, lag=0, R_vend=None):
     """W decidido em t, executado em t+1+lag, rende de t+2+lag. Devolve pesos executados e contribuição diária por moeda (USD)."""
     R = R.fillna(0)
     We = W.reindex(index=R.index, columns=R.columns).fillna(0).shift(1 + lag).fillna(0)
     custo = pd.Series({k: CUSTO[MOEDAS[k][1]] for k in R.columns})
-    C = We.shift(1).fillna(0) * R - We.diff().abs().fillna(We.abs()) * custo * custo_mult
+    Wv = We.shift(1).fillna(0)
+    Rv = R if R_vend is None else R_vend.reindex_like(R).fillna(0)
+    C = Wv.clip(lower=0) * R + Wv.clip(upper=0) * Rv - We.diff().abs().fillna(We.abs()) * custo * custo_mult
     return We, C
 
 
 def excesso(d, custo_mult=1, lag=0, regime=REGIME, **params):
     p = {**PARAMS, **params}
-    W, R, _, _ = _livro(d, **p)
-    _, C = _executa(W, R, custo_mult, lag)
+    W, R, _, _, Rv = _livro(d, **p)
+    _, C = _executa(W, R, custo_mult, lag, Rv)
     return aplica_regime(brl(C.sum(axis=1)), regime, CUSTO_TROCA * custo_mult)
 
 
 def posicoes(d, **params):
     """W: pesos-alvo decididos em t; R: excesso diário por moeda em USD (spot + carry). Calendário dos EUA. Sem regime."""
-    W, R, _, _ = _livro(d, **{**PARAMS, **params})
-    return W, R.fillna(0)
+    W, R, _, _, Rv = _livro(d, **{**PARAMS, **params})
+    return W, R.fillna(0)                                     # (atribuição/placebo usam o carry de quem compra; o excesso usa os dois)
 
 
 def negocios(d, **params):
     """Um episódio contínuo de posição (mesmo lado) por moeda. Sem regime; contribuição em USD (pp do PL), líquida de custo."""
-    W, R, spot, car = _livro(d, **{**PARAMS, **params})
-    We, C = _executa(W, R)
+    W, R, spot, car, Rv = _livro(d, **{**PARAMS, **params})
+    We, C = _executa(W, R, R_vend=Rv)
     spot, car = spot.reindex(R.index).fillna(0), car.reindex(R.index).fillna(0)
     lin, idx = [], We.index
     for c in We.columns:
