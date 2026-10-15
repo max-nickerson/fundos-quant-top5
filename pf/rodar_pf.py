@@ -98,6 +98,21 @@ AUDITORIA = {
     "gl_wsp": ("BETA", "exposição a S&P em R$ com tendência — beta de ações, não alfa"),
     "cme_metais": ("BETA", "ouro comprado em 2024–26 (10 negócios); IS ≈ 0"),
     "cme_tendencia": ("BETA", "tendência com 2–6 posições; PBO 85% com R$ 20 mil"),
+    # auditoria PF2 (pf/pesquisa/auditoria_pf2.md)
+    "bb_dividendo_extra": ("SUBSTITUÍDO", "universo de 103 cias; ver bb_dividendo_extra_aud (todas as pagadoras, ADV >= R$ 5 mi)"),
+    "bb_dividendo_extra_aud": ("APROVADO COM CORREÇÃO", "sobrevivência não infla (deslistadas rendem igual); conservador ADV >= R$ 20 mi: +10,1/+8,3 pp"),
+    "fu_agro_spread": ("SUBSTITUÍDO", "entrada em ajuste teórico (H+1 sem negócio no início de março); ver fu_agro_spread_aud"),
+    "fu_agro_spread_aud": ("APROVADO COM CORREÇÃO", "frágil: lado invertido após o IS, 9 safras (t = 1,8), walk-forward −1,9; satélite de 1 spread"),
+    "jx_wdo_panico": ("REPROVADO", "as 8 variantes perdem no IS; Selic alta perdeu −17 pp no IS; 1 WDO = 2,5x R$ 20 mil (2008: −76% do capital)"),
+    "fu_eurex_micro": ("REPROVADO", "10 negócios OOS; sem ago/2024 ≈ 0; sem os 10 melhores −2,1"),
+    "lg_combo_regime": ("REPROVADO", "custo 2x −2,5 pp; t+2 −1,6 pp"),
+    "lg_b3_etf_bdr": ("REPROVADO", "XINA11 (noite = pregão chinês) é 1,3 de 1,6 pp; sem ele +0,3, custo 2x −0,2"),
+    "op_wheel": ("BETA", "ações PETR/VALE/ITUB = +44 pp OOS; opções somam −0,3 pp; beta 0,28 (t = 8)"),
+    "op_copom": ("REPROVADO", "8 vendas de cauda em 10 meses, sem negócio no IS; walk-forward −56 pp"),
+    "cr_eventos": ("REPROVADO", "2025 = +80 pp; OOS sem 2025 −4,2 pp; walk-forward −6"),
+    "cr_panico": ("REPROVADO", "versão escolhida +0,5 pp; a 'boa' (top20) não foi escolhida no IS e tem vizinhos −8 a −32"),
+    "bb_insider_small": ("REPROVADO", "−1,6/−2,2 pp; o 'bug' de acentos do VLMO não existia (mesmos 11.048 eventos)"),
+    "bb_insider_small_aud": ("SUBSTITUÍDO", "idêntico ao original (leitura normalizada do VLMO)"),
 }
 
 

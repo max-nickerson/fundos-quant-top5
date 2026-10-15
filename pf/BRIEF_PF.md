@@ -41,3 +41,25 @@ estratégia. Nada de "é porque é momentum/baixa vol": explicar com os NEGÓCIO
   rolagem de futuros contínuos do Yahoo (use ETF ou trate o roll); posição não marcada a mercado (box/termo foram artefatos).
 - Resposta final ≤ 350 palavras: tabela (fundo, aplicável?, OOS vs CDI antes/depois do IR com R$ 20 mil e R$ 50 mil, IR, PBO, P(bater)) e as
   2–3 ideias mais promissoras com a razão concreta (negócios).
+
+---
+# RODADA PF2 — "testa tudo": outros países, mercados, ativos e derivativos
+
+O dono achou que testamos pouco. Nesta rodada cada frente testa **8 estratégias NOVAS** (não repita as 58 de `pf/ja_testados.txt`),
+com o mesmo contrato, motor (`pf/pf.py`), IR (`pf/ir.py` — declare `CLASSE_IR`: acoes, etf_b3, futuros_b3, opcoes_b3, day_trade, fii,
+exterior, renda_fixa, isento, cripto) e bateria (`python pf/rodar_pf.py um <arquivo>` — rode CADA fundo com isso até terminar sem erro
+e com o truncamento passando). Os módulos auxiliares das frentes ficam em `pf/fundos/` e entram no `sys.path` automaticamente.
+
+O que funcionou até agora (use como inspiração, procure o equivalente em outros mercados): todo edge de PF que sobreviveu tem um
+**vendedor/comprador forçado** do outro lado e **tamanho pequeno**: leilão de fechamento após queda forte (+5,7 pp), OPA de small cap até o
+leilão (+4,0), petróleo em pânico (+2,9), tranche de varejo de ofertas (+2,5), rebalanceamento do Ibovespa (+1,0). O que morreu: câmbio sem
+hedge sobre o capital inteiro, contrato grande demais para o capital, fills de ordem limitada com dado diário, beta disfarçado (ações/cripto/
+ouro/S&P subindo), cauda (VXM quebra em mar/2020).
+
+Regras extras desta rodada:
+- Dados gratuitos (yfinance para ações/ETFs/índices/futuros do mundo todo com OHLC; Cboe índices; FRED; BCB; B3 COTAHIST/opções/futuros já
+  baixados; Binance/Coinbase públicos para cripto se acessíveis). Cache em `pf/dados/<frente>/`.
+- Quem opera fora do Brasil: só a margem/patrimônio necessário na IBKR (`pf.custo_conta_exterior`); o resto em CDI.
+- Ao terminar: `pf/pesquisa/<frente>.md` (tese, negócios, o que deu certo e por quê, o que deu errado) e resposta final ≤ 300 palavras
+  com a tabela (fundo, OOS antes/depois do IR com R$ 20 mil e R$ 50 mil, IR, PBO, P(bater), sem os 10 melhores).
+- NÃO use run_in_background nem espere notificações: rode tudo em primeiro plano com timeout longo e só termine quando tudo estiver pronto.

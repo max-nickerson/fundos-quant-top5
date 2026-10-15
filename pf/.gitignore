@@ -33,3 +33,12 @@ __pycache__/
 pesquisa/_aud*.py
 !dados/b3_acoes/opa_eventos.parquet
 !dados/b3_acoes/leiloes_017.parquet
+!dados/auditoria/
+!dados/auditoria/arb_proventos.parquet
+!dados/auditoria/proventos_b3_extra.parquet
+!dados/b3_acoes/painel_H.parquet
+!dados/b3_acoes/painel_L.parquet
+!dados/b3_acoes/painel_NEG.parquet
+!dados/b3_acoes/painel_dy.parquet
+!dados/pf2_b3/
+!dados/pf2_b3/ipe_proventos.parquet
