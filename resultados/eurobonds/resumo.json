@@ -1,0 +1,13 @@
+{
+ "variantes": 1451.0,
+ "PBO %": NaN,
+ "% variantes que batem o benchmark OOS": 100.0,
+ "mediana das variantes OOS pp": 3.6062978684119784,
+ "Sharpe deflacionado (grade) %": 74.35473123364464,
+ "Sharpe deflacionado (109 estratégias x grade) %": 73.49263871161979,
+ "excesso bruto OOS real pp": 4.203032645711488,
+ "placebo mediana pp": 0.0,
+ "placebo p95 pp": 4.490213246396156,
+ "p-valor (fração de placebos >= real)": 0.065,
+ "walk-forward ativo OOS pp": 4.3313891692477995
+}

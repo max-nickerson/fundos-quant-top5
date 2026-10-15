@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+saida_completa.txt
+.venv/
