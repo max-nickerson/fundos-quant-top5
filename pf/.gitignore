@@ -31,3 +31,5 @@ resultados/**
 !resultados/top*.png
 __pycache__/
 pesquisa/_aud*.py
+!dados/b3_acoes/opa_eventos.parquet
+!dados/b3_acoes/leiloes_017.parquet
