@@ -1,0 +1,33 @@
+# dados: só o que o top 5 precisa (o resto é regenerável pelos scripts das frentes)
+dados/**
+!dados/
+!dados/b3_acoes/
+!dados/b3_acoes/mapa_cnpj.parquet
+!dados/b3_acoes/ofertas.parquet
+!dados/b3_acoes/painel_ASK.parquet
+!dados/b3_acoes/painel_BID.parquet
+!dados/b3_acoes/painel_O.parquet
+!dados/b3_acoes/painel_P.parquet
+!dados/b3_acoes/painel_R.parquet
+!dados/b3_acoes/painel_V.parquet
+!dados/macro_hedge/
+!dados/macro_hedge/acoes_O.parquet
+!dados/macro_hedge/acoes_P.parquet
+!dados/macro_hedge/acoes_R.parquet
+!dados/macro_hedge/acoes_V.parquet
+!dados/macro_hedge/br.parquet
+!dados/macro_hedge/eua.parquet
+!dados/macro_hedge/eventos.parquet
+!dados/rev_eventos/
+!dados/rev_eventos/*.parquet
+# resultados: só resumos e figuras
+resultados/**
+!resultados/
+!resultados/ranking_pf.csv
+!resultados/ranking_pf.txt
+!resultados/carteira_pf.csv
+!resultados/carteira_*.png
+!resultados/carteira_*.csv
+!resultados/top*.png
+__pycache__/
+pesquisa/_aud*.py

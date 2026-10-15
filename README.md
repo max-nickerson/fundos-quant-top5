@@ -6,6 +6,8 @@ crédito, commodities, opções e eventos) e a **três auditorias** de bugs e vi
 
 > Pesquisa, não recomendação de investimento. Resultados simulados com custos estimados; o passado não garante o futuro.
 
+> **Rodada pessoa física (R$ 20–50 mil, todas as contas como um fundo, caixa em CDI, 52 estratégias):** veja [`pf/`](pf/README.md).
+>
 > **Pessoa física com R$ 20 mil?** Veja [`varejo/`](varejo/README.md): os mesmos 5 fundos com instrumentos, custos, lotes, câmbio, alavancagem
 > e IR de varejo (IBKR, Clear, Rico...), mais o mapa ativo por ativo de onde cada coisa pode ser operada.
 
