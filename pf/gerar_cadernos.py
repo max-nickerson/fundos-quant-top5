@@ -7,7 +7,8 @@ import pandas as pd
 AQUI = Path(__file__).resolve().parent
 BAT, PESQ = AQUI / "resultados" / "bateria", AQUI / "pesquisa"
 FRENTES = {"rev_": "revisita", "b3_": "b3_acoes", "rf_": "renda_fixa", "gl_": "global_cripto", "db3_": "deriv_b3", "cme_": "micro_cme",
-           "mh_": "macro_hedge"}
+           "mh_": "macro_hedge", "lg_": "pf2_leilao_global", "fg_": "pf2_fluxo_global", "op_": "pf2_opcoes", "fu_": "pf2_futuros",
+           "cr_": "pf2_cripto", "em_": "pf2_emergentes", "bb_": "pf2_b3", "jx_": "pf2_juros_fx", "mx_": "pf3_mecanismos"}
 
 
 def f(x, d=2):
@@ -55,7 +56,7 @@ if __name__ == "__main__":
     grupos = {}
     for p in sorted(BAT.glob("*.pkl")):
         o = pickle.load(open(p, "rb"))
-        fr = next((v for k, v in FRENTES.items() if o["nome"].startswith(k)), "outros")
+        fr = "pf3_internacional" if o["nome"].endswith("_v2") else next((v for k, v in FRENTES.items() if o["nome"].startswith(k)), "outros")
         grupos.setdefault(fr, []).append(o)
     for fr, lst in grupos.items():
         lst.sort(key=lambda o: -(rk.get(o["nome"], {}).get("nota", 0) or 0))

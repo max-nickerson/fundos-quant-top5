@@ -136,8 +136,24 @@ def vendas(m, d, capital):
         return None
 
 
+def apos_ir_v2(m, d, capital, r):
+    """Fundos com a conta em dólar v2 (pf.conta_usd): o livro lá fora paga 15% ao ano (exterior), o hedge em WDO paga 15% na apuração
+    mensal da B3, e o CDI que o sleeve deixou de ganhar também deixou de pagar os 15% do CDI."""
+    cls = m.classes_ir(d, capital=capital)
+    cdi_l = pf.cdi_liquido().reindex(r.index).fillna(0)
+    ex = sum(IRPF.imposto_excesso(cls[c].reindex(r.index).fillna(0) / capital, capital, c) for c in ("exterior", "futuros_b3") if c in cls)
+    perdido = cls.get("cdi_perdido", 0)
+    perdido = (perdido.reindex(r.index).fillna(0) if hasattr(perdido, "reindex") else perdido) / capital * (1 - .15)
+    return cdi_l + ex - perdido
+
+
 def apos_ir(m, d, capital, r, nome=None):
     """IR de pessoa física do jeito certo (pf/ir.py): mensal na B3 com isenção de ações ≤ R$ 20 mil/mês, anual no exterior, etc."""
+    if m is not None and d is not None and hasattr(m, "classes_ir") and getattr(m, "CONTA_USD_V2", False):
+        try:
+            return apos_ir_v2(m, d, capital, r)
+        except Exception as ex:
+            print("   apos_ir_v2 falhou, usando a classe única:", ex)
     cls = classe_ir(nome or getattr(m, "__name__", ""), m)
     vm = vendas(m, d, capital) if (cls in IRPF.ISENCAO and d is not None and hasattr(m, "posicoes")) else None
     return IRPF.cota_apos_ir(r, C.CDI, capital, cls, vm)
@@ -221,7 +237,8 @@ def ranking():
         cls = classe_ir(o["nome"])
         mm = types.SimpleNamespace(CLASSE_IR=cls, CORTE=o["CORTE"], BENCHMARK="CDI")
         mod = dd = None
-        if cls in IRPF.ISENCAO:                                   # precisa das vendas do mês para a isenção
+        v2 = "conta_usd" in (FUNDOS_DIR / f"{o['nome']}.py").read_text(encoding="utf-8", errors="ignore")
+        if cls in IRPF.ISENCAO or v2:                             # precisa das vendas do mês (isenção) ou das classes da conta em dólar
             try:
                 mod = carrega_modulo(o["nome"])
                 dd = mod.carrega()

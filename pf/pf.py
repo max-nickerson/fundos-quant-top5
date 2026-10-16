@@ -172,3 +172,65 @@ def cdi_liquido():
 def excesso_de_pnl(pnl_brl, capital):
     """P&L diário em R$ (já com custos) sobre um patrimônio de `capital` (constante em R$) -> excesso diário sobre o CDI."""
     return (pnl_brl.reindex(DIAS).fillna(0) / capital)
+
+
+# ---------------------------------------------------------------- conta em dólar v2 ("o dinheiro já mora na IBKR")
+# Pedido do dono: parte do fundo FICA em dólar na IBKR (não volta), o caixa parado compra T-bill (SGOV/BIL), e o câmbio é hedgeado no
+# Brasil vendendo mini-dólar (WDO = US$ 10 mil por contrato, contratos INTEIROS), com a garantia em Tesouro Selic.
+#   - um short de dólar futuro rende ≈ CDI − cupom cambial: com o T-bill lá fora, o dinheiro em dólar hedgeado ≈ CDI − (cupom − T-bill) − custos;
+#   - só a 1ª remessa paga IOF (1,1%) + spread (0,5%) — o dinheiro não volta;
+#   - sem hedge (ou se o arredondamento der 0 contrato) o saldo fica exposto ao R$/US$.
+WDO_USD = 10_000.0
+WDO_ROLAGEM_BRL = 6.0          # por contrato por mês: taxas B3 + corretagem + ~0,5 ponto de spread na rolagem (R$ 10/ponto)
+_CUPOM = None
+
+
+def cupom_cambial():
+    """Cupom cambial curto (a.a.): FRC/DDI da B3 desde 2019; antes, T-bill + 1,07 pp (spread medido 2019+, ver auditoria do carry)."""
+    global _CUPOM
+    if _CUPOM is None:
+        c = pd.read_csv(RAIZ / "dados" / "carry_moedas" / "cupom_frc.csv", index_col=0, parse_dates=True).iloc[:, 0] / 100
+        tb = (TBILL.reindex(DIAS, method="ffill") * 252)
+        _CUPOM = c.reindex(DIAS).ffill(limit=10).combine_first(tb + .0107).reindex(DIAS).ffill()
+    return _CUPOM
+
+
+def conta_usd(pnl_usd, exposicao_usd, sleeve_brl, capital, hedge="inteiro", caixa_tbill=True, iof_inicial=True, custo_mult=1.0):
+    """Converte o livro em dólar de uma estratégia num excesso diário sobre o CDI do fundo inteiro (R$), com a conta v2.
+
+    pnl_usd: P&L diário em US$ do livro (já com custos da IBKR), calendário dos EUA, para um livro do tamanho do sleeve.
+    exposicao_usd: exposição líquida ao dólar em US$ (≈ patrimônio da conta; o que precisa de hedge), calendário dos EUA ou escalar (= sleeve).
+    sleeve_brl: R$ mantidos em dólar (ex.: 5, 10 ou 15 mil de 20 mil). capital: patrimônio total do fundo em R$.
+    hedge: 'nenhum' | 'inteiro' (round) | 'piso' (floor) — nº de WDO vendidos = exposição / US$ 10 mil.
+    Devolve (excesso_fundo, dict de P&L em R$ por classe de IR: 'exterior' e 'futuros_b3')."""
+    pnl_br = usd_para_br(pnl_usd) * PTAX                                  # P&L do livro convertido no dia
+    # patrimônio da conta em US$: o fundo mantém lá o equivalente a `sleeve_brl` (capital constante em R$, como o resto do motor),
+    # recalibrado no 1º dia de cada mês pelo câmbio do dia; dentro do mês o saldo varia com o P&L do livro.
+    per = pd.Series(DIAS.to_period("M"), index=DIAS)
+    base_mes = (sleeve_brl / PTAX).groupby(per).transform("first")
+    pnl_mes = usd_para_br(pnl_usd).groupby(per).cumsum()
+    saldo_usd = (base_mes + pnl_mes).reindex(DIAS).ffill()
+    fx_ret = PTAX.pct_change(fill_method=None).fillna(0)
+    tb_dia = TBILL.reindex(DIAS, method="ffill").fillna(0)
+    juros_caixa = saldo_usd.shift(1).fillna(0) * PTAX.shift(1).fillna(PTAX.iloc[0]) * (tb_dia - .0010 / 252) * (1.0 if caixa_tbill else 0.0)
+    cambio = saldo_usd.shift(1).fillna(0) * PTAX.shift(1).fillna(PTAX.iloc[0]) * fx_ret
+    expo = (exposicao_usd if np.isscalar(exposicao_usd) else usd_para_br(exposicao_usd.diff().fillna(exposicao_usd)).cumsum())
+    expo = pd.Series(expo, index=DIAS) if np.isscalar(expo) else expo.reindex(DIAS).ffill()
+    expo_total = saldo_usd if np.isscalar(exposicao_usd) else expo
+    alvo = expo_total / WDO_USD
+    n = {"nenhum": 0 * alvo, "inteiro": alvo.round(), "piso": np.floor(alvo)}[hedge].clip(lower=0)
+    n = n.groupby(n.index.to_period("M")).transform("first")               # ajusta o hedge 1x por mês (na rolagem)
+    cup = cupom_cambial()
+    # short de WDO: −variação do dólar + diferencial (CDI − cupom) sobre o nocional em R$
+    noc = n.shift(1).fillna(0) * WDO_USD * PTAX.shift(1).fillna(PTAX.iloc[0])
+    pnl_hedge = noc * (-fx_ret + (CDI - cup / 252))
+    rolagem = n * WDO_ROLAGEM_BRL * custo_mult
+    rolagem = rolagem.where(n.index.to_period("M") != pd.Series(n.index.to_period("M"), index=n.index).shift(1), 0.0)
+    cdi_perdido = sleeve_brl * CDI                                          # o sleeve deixou de render CDI no Brasil
+    remessa = pd.Series(0.0, index=DIAS)
+    if iof_inicial:
+        remessa.iloc[0] = sleeve_brl * (REMESSA_IDA + SPREAD_CAMBIO)
+    p_ext = pnl_br + juros_caixa + cambio - remessa
+    p_b3 = pnl_hedge - rolagem
+    ex = (p_ext + p_b3 - cdi_perdido) / capital
+    return ex.fillna(0), {"exterior": p_ext.fillna(0), "futuros_b3": p_b3.fillna(0), "cdi_perdido": cdi_perdido, "n_wdo": n}

@@ -188,50 +188,6 @@ Gerado por `pf/gerar_cadernos.py` a partir de `pf/resultados/bateria/`. IR de pe
 | BRFS3   |  42.42 |       8 |
 | SMTO3   | -47.64 |      17 |
 
-### Real tático (juro real BR-EUA) em WDO + Brasil após pânico  (`mh_real_tatico`)
-
-**Tese:** Vendo/compro mini-dólar quando o diferencial de juro real Brasil-EUA está extremo vs 5 anos; e compro Brasil (BOVA11/WIN) por 42 pregões depois de pânico brasileiro que não foi global
-
-**Instrumentos:** B3 (Clear/Rico): WDO (US$ 10 mil, margem ~12% em Tesouro Selic, ~R$ 3,70 por contrato e lado com meio tick, rola todo mês); BOVA11 (cotas inteiras; lote/fracionário) ou WIN (R$ 0,20/ponto) no livro de pânico
-
-**Aplicável:** True — Pânico: aplicável com qualquer capital (BOVA11). Juro: só com R$ 50 mil (1 WDO ~ 1x o capital); com R$ 20 mil arredonda para 0 ou vira 2,5x o capital em dólar
-
-| métrica | valor |
-|---|---|
-| OOS desde | 2021-01 |
-| retorno OOS a.a. (R$ 20 mil) | 9.1% vs CDI 11.4% |
-| ativo OOS pp (R$ 20 mil / R$ 50 mil) | -2.34 / +4.79 |
-| depois do IR (classe acoes) pp, 20k / 50k | -2.30 / +4.71 |
-| IR OOS / Sharpe | -0.08 / -0.08 |
-| pior queda | -37.6% |
-| PBO / Sharpe deflacionado | 45% / +0% |
-| leque de parâmetros p5 / mediana / p95 | -2.34 / -2.34 / -2.34 |
-| custo 2x / execução t+2 | -2.40 / -2.05 |
-| walk-forward | -2.34 |
-| sem os 10 melhores negócios | -2.34 |
-| placebo p | 0.61 |
-| look-ahead (truncamento) | passou |
-
-**10 melhores negócios**
-
-| ativo   |   lado | entrada    | saida      |   dias |   retorno_% |   contrib_pp |
-|:--------|-------:|:-----------|:-----------|-------:|------------:|-------------:|
-| WDO     |      1 | 2017-06-02 | 2021-08-11 |   1052 |       42.46 |        74.45 |
-| WDO     |     -1 | 2016-03-24 | 2017-04-17 |    268 |       25.43 |        48.69 |
-
-**10 piores negócios**
-
-| ativo   |   lado | entrada    | saida      |   dias |   retorno_% |   contrib_pp |
-|:--------|-------:|:-----------|:-----------|-------:|------------:|-------------:|
-| WDO     |     -1 | 2016-03-24 | 2017-04-17 |    268 |       25.43 |        48.69 |
-| WDO     |      1 | 2017-06-02 | 2021-08-11 |   1052 |       42.46 |        74.45 |
-
-**Quem trouxe o retorno (soma por ativo, pp)**
-
-| ativo   |    sum |   count |
-|:--------|-------:|--------:|
-| WDO     | 123.14 |       2 |
-
 ### Pares intra-setor B3 sem notícia (aluguel PF)  (`mh_pares`)
 
 **Tese:** Vendo a ação que disparou contra a par do mesmo negócio sem notícia e compro a que ficou para trás; saio quando o resíduo zera (aluguel PF real, fracionário)
@@ -300,6 +256,50 @@ Gerado por `pf/gerar_cadernos.py` a partir de `pf/resultados/bateria/`. IR de pe
 | BBDC4   | -1.79 |       7 |
 | LREN3   | -1.86 |       1 |
 | ISAE4   | -1.88 |       3 |
+
+### Real tático (juro real BR-EUA) em WDO + Brasil após pânico  (`mh_real_tatico`)
+
+**Tese:** Vendo/compro mini-dólar quando o diferencial de juro real Brasil-EUA está extremo vs 5 anos; e compro Brasil (BOVA11/WIN) por 42 pregões depois de pânico brasileiro que não foi global
+
+**Instrumentos:** B3 (Clear/Rico): WDO (US$ 10 mil, margem ~12% em Tesouro Selic, ~R$ 3,70 por contrato e lado com meio tick, rola todo mês); BOVA11 (cotas inteiras; lote/fracionário) ou WIN (R$ 0,20/ponto) no livro de pânico
+
+**Aplicável:** True — Pânico: aplicável com qualquer capital (BOVA11). Juro: só com R$ 50 mil (1 WDO ~ 1x o capital); com R$ 20 mil arredonda para 0 ou vira 2,5x o capital em dólar
+
+| métrica | valor |
+|---|---|
+| OOS desde | 2021-01 |
+| retorno OOS a.a. (R$ 20 mil) | 9.1% vs CDI 11.4% |
+| ativo OOS pp (R$ 20 mil / R$ 50 mil) | -2.34 / +4.79 |
+| depois do IR (classe acoes) pp, 20k / 50k | -2.30 / +4.71 |
+| IR OOS / Sharpe | -0.08 / -0.08 |
+| pior queda | -37.6% |
+| PBO / Sharpe deflacionado | 45% / +0% |
+| leque de parâmetros p5 / mediana / p95 | -2.34 / -2.34 / -2.34 |
+| custo 2x / execução t+2 | -2.40 / -2.05 |
+| walk-forward | -2.34 |
+| sem os 10 melhores negócios | -2.34 |
+| placebo p | 0.61 |
+| look-ahead (truncamento) | passou |
+
+**10 melhores negócios**
+
+| ativo   |   lado | entrada    | saida      |   dias |   retorno_% |   contrib_pp |
+|:--------|-------:|:-----------|:-----------|-------:|------------:|-------------:|
+| WDO     |      1 | 2017-06-02 | 2021-08-11 |   1052 |       42.46 |        74.45 |
+| WDO     |     -1 | 2016-03-24 | 2017-04-17 |    268 |       25.43 |        48.69 |
+
+**10 piores negócios**
+
+| ativo   |   lado | entrada    | saida      |   dias |   retorno_% |   contrib_pp |
+|:--------|-------:|:-----------|:-----------|-------:|------------:|-------------:|
+| WDO     |     -1 | 2016-03-24 | 2017-04-17 |    268 |       25.43 |        48.69 |
+| WDO     |      1 | 2017-06-02 | 2021-08-11 |   1052 |       42.46 |        74.45 |
+
+**Quem trouxe o retorno (soma por ativo, pp)**
+
+| ativo   |    sum |   count |
+|:--------|-------:|--------:|
+| WDO     | 123.14 |       2 |
 
 ### Fato relevante (não-balanço) em large caps, beta em WIN  (`mh_evento_beta`)
 

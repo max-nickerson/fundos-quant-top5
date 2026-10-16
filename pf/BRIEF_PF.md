@@ -63,3 +63,27 @@ Regras extras desta rodada:
 - Ao terminar: `pf/pesquisa/<frente>.md` (tese, negócios, o que deu certo e por quê, o que deu errado) e resposta final ≤ 300 palavras
   com a tabela (fundo, OOS antes/depois do IR com R$ 20 mil e R$ 50 mil, IR, PBO, P(bater), sem os 10 melhores).
 - NÃO use run_in_background nem espere notificações: rode tudo em primeiro plano com timeout longo e só termine quando tudo estiver pronto.
+
+---
+# RODADA PF3 — conta em dólar v2 + transferência de mecanismos
+
+## Conta em dólar v2 (`pf.conta_usd`)
+O dono definiu: parte do fundo MORA na IBKR em dólar (não volta), o caixa parado compra T-bill (SGOV), só a 1ª remessa paga IOF+spread, e o
+câmbio é hedgeado no Brasil vendendo mini-dólar (WDO, US$ 10 mil, contratos inteiros; o short rende CDI − cupom). Use SEMPRE `pf.conta_usd(pnl_usd,
+exposicao_usd, sleeve_brl, capital, hedge=...)` para levar o livro em dólar ao excesso do fundo. Custo puro de manter o caixa fora (sem estratégia),
+pp a.a. do fundo, OOS 2021+: R$ 20 mil com R$ 5/10/15 mil fora = −1,9/−3,9/−6,0 SEM hedge (o hedge arredonda para 0 contrato); R$ 50 mil com
+R$ 37,5 mil fora + 1 WDO = +1,6 (sobre-hedge); R$ 100 mil com R$ 55 mil + 1 WDO = −0,5.
+Cada fundo internacional desta rodada precisa: parâmetros `sleeve_brl` e `hedge` em `excesso(d, capital=..., sleeve_brl=..., hedge=..., ...)`
+(defaults: metade do capital e 'inteiro'), `SLEEVES = {20000: [5000, 10000, 15000], 50000: [12500, 25000, 37500]}` e `classes_ir()` devolvendo o dict
+de `conta_usd` ('exterior' e 'futuros_b3'). Reporte a tabela capital × sleeve × hedge(nenhum/inteiro): OOS antes/depois do IR.
+
+## Transferência de mecanismos (o dono NÃO quer só combinar modelos)
+Os vencedores auditados provam 4 mecanismos. Use-os como HIPÓTESES em outros modelos:
+1. Calendário obriga alguém a comprar/vender (data-com do dividendo extraordinário; fundo de índice; leilão da OPA).
+2. Vendedor em pânico + ÂNCORA de preço (PETR4 vs Brent; ação vs preço da OPA): só compra o pânico quando existe uma âncora que divergiu.
+3. O edge cresce com o TAMANHO do evento (dividendo só paga acima de 5%) → limiares de magnitude.
+4. Ser pequeno é a vantagem (small caps na OPA; tranche de varejo).
+E os anti-mecanismos (filtros obrigatórios): "spread" que é só fuso; beta disfarçado; cauda vendida; fill de ordem limitada com dado diário.
+
+Nota para os fundos com conta em dólar v2: defina `CONTA_USD_V2 = True` no módulo e `classes_ir(d, capital=..., **params)` devolvendo o dict
+da `pf.conta_usd` (chaves 'exterior', 'futuros_b3', 'cdi_perdido') — o executor usa isso para o IR (exterior anual 15%; hedge B3 mensal 15%).
